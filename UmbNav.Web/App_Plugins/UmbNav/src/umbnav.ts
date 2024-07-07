@@ -1,144 +1,280 @@
 import { LitElement, html, css, customElement, property } from "@umbraco-cms/backoffice/external/lit";
-import Sortable from 'sortablejs';
+import { repeat } from 'lit/directives/repeat.js';
+import { TemplateResult } from 'lit';
 import { UmbPropertyEditorUiElement } from "@umbraco-cms/backoffice/extension-registry";
 
 interface TreeNode {
     id: string;
     label: string;
-    children?: TreeNode[];
+    description?: string;
+    children: TreeNode[];
+    expanded?: boolean;
 }
-
-const treeData: TreeNode[] = [
-    {
-        id: "1",
-        label: "Item 1",
-        children: [
-            {
-                id: "1-1",
-                label: "Item 1.1",
-                children: [
-                    { id: "1-1-1", label: "Item 1.1.1" },
-                    { id: "1-1-2", label: "Item 1.1.2" }
-                ]
-            },
-            { id: "1-2", label: "Item 1.2" }
-        ]
-    },
-    {
-        id: "2",
-        label: "Item 2",
-        children: [
-            { id: "2-1", label: "Item 2.1" }
-        ]
-    },
-    { id: "3", label: "Item 3" }
-];
 
 @customElement('umbnav-property-editor-ui')
 export default class UmbNavPropertyEditorUIElement extends LitElement implements UmbPropertyEditorUiElement {
-    @property({ type: String })
-    public value = "";
-
     @property({ type: Array })
-    public treeData: TreeNode[] = treeData;
-
-    // Property to hold references to the sortable instances
-    private sortables: Sortable[] = [];
-
-    // Method to initialize the sortable tree
-    private initializeSortable() {
-        const treeElements = this.shadowRoot?.querySelectorAll('.sortable-tree');
-        if (treeElements) {
-            treeElements.forEach((element) => {
-                const sortable = new Sortable(element as HTMLElement, {
-                    group: {
-                        name: 'nested',
-                        pull: true,
-                        put: true
-                    },
-                    animation: 150,
-                    ghostClass: 'sortable-ghost',
-                    onEnd: () => {
-                        // Handle the end of the sorting
-                        console.log('New order:', this.sortables.map(s => s.toArray()));
-                    }
-                });
-                this.sortables.push(sortable);
-            });
+    tree: TreeNode[] = [
+        { id: '1', label: 'Root 1', children: [] },
+        {
+            id: '2', label: 'Root 2', children: [
+                { id: '3', label: 'Child 2.1', children: [] },
+                { id: '4', label: 'Child 2.2', children: [] }
+            ]
         }
-    }
-
-    // Method to clean up the sortable instances
-    private destroySortable() {
-        this.sortables.forEach(sortable => sortable.destroy());
-        this.sortables = [];
-    }
-
-    connectedCallback() {
-        super.connectedCallback();
-        // Initialize the sortable tree after the element is connected to the DOM
-        this.initializeSortable();
-    }
-
-    disconnectedCallback() {
-        super.disconnectedCallback();
-        // Clean up the sortable instances when the element is removed from the DOM
-        this.destroySortable();
-    }
+    ];
 
     static styles = css`
-        :host {
-            display: block;
-            padding: 16px;
-            font-family: Arial, sans-serif;
-        }
+    :host {
+      margin: 0;
+      padding: 0;
+    }
 
-        .sortable-tree {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
 
-        .sortable-tree li {
-            padding: 8px;
-            margin: 4px 0;
-            background-color: #f0f0f0;
-            border: 1px solid #ddd;
-            cursor: grab;
-        }
+    .tree-node {
+      display: flex;
+      align-items: center;
+      padding: 5px 10px;
+      border: 1px solid var(--uui-color-border, #d8d7d9);
+      border-radius: 4px;
+      margin-bottom: 5px;
+      background-color: var(--uui-color-surface, #fff);
+      cursor: all-scroll;
+      transition: background-color 0.3s ease;
+      min-height: var(--uui-size-14);
 
-        .sortable-ghost {
-            opacity: 0.4;
-        }
+    }
 
-        .nested-list {
-            margin-left: 20px;
-            padding-left: 10px;
-            border-left: 2px dashed #ddd;
-        }
-    `;
+    .tree-node.dragging {
+      opacity: 0.5;
+    }
 
-    renderTreeNodes(nodes: TreeNode[] | undefined): any {
-        if (!nodes) return html``;
+    .drop-target {
+      border-top: 2px solid #007acc;
+      margin: -1px 0;
+    }
+
+    .collapse-toggle {
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .collapse-toggle-placeholder {
+      width: 10px;
+      margin-right: 10px;
+    }
+
+    .children {
+      padding-left: 20px;
+    }
+
+    .children.expanded {
+      display: block;
+    }
+
+    .children.collapsed {
+      display: none;
+    }
+
+    .tree-node:hover {
+        border-color: var(--uui-color-border-emphasis, #a1a1a1);
+    }
+
+    .flex {
+        display: flex;
+    }
+
+    #icon {
+        display: flex;
+        font-size: 1.2em;
+        margin-left: var(--uui-size-2, 6px);
+        margin-right: var(--uui-size-1, 3px);
+    }
+
+    #info {
+        display: flex;
+        align-items: start;
+        justify-content: center;
+        height: 100%;
+        padding-left: var(--uui-size-2, 6px);
+    }
+
+    #name {
+        font-weight: 700;
+    }
+    
+    #name:hover {
+        font-weight: 700;
+        text-decoration: underline;
+        color: var(--uui-color-interactive-emphasis, #3544b1);
+    }
+
+    .umbnav-badge {
+        padding: .3em .6em .3em;
+        font-size: 75%;
+        font-weight: 700;
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: .25em;
+        background-color: #337ab7;
+        margin-left: 6px;
+    }
+
+    #buttons {
+        margin-left: auto;
+    }
+  `;
+
+    private draggedNode: TreeNode | null = null;
+
+    renderNode(node: TreeNode): TemplateResult {
         return html`
-            <ul class="sortable-tree">
-                ${nodes.map(node => html`
-                    <li data-id="${node.id}">
-                        ${node.label}
-                        ${this.renderTreeNodes(node.children)}
-                    </li>
-                `)}
+          <li
+            draggable="true"
+            @dragstart=${(e: DragEvent) => this.onDragStart(e, node)}
+            @dragover=${(e: DragEvent) => e.preventDefault()}
+            @dragenter=${(e: DragEvent) => this.onDragEnter(e)}
+            @dragleave=${(e: DragEvent) => this.onDragLeave(e)}
+            @drop=${(e: DragEvent) => this.onDrop(e, node)}
+          >
+          <div class="tree-node">
+                    <!-- div keeps icon and nodename from wrapping -->
+                    <!-- <i class="umb-node-preview__icon" aria-hidden="true"></i> -->
+                    <span id="icon">
+                        <uui-icon name="document"></uui-icon>
+                    </span>
+                    <div id="info">
+                        <div id="name">
+                            ${node.label}
+                        </div>
+                        <!-- <span class="umbnav-badge">Includes Child Nodes</span> -->
+                    </div>
+                    <div id="buttons">
+                        <uui-action-bar>
+                        ${node.children.length > 0
+                                ? html`
+                                ${node.expanded ? 
+                                    html `<uui-button look="default" color="default" label="Expand" @click=${() => this.toggleNode(node)}>
+                                    <uui-icon name="icon-arrow-up"></uui-icon>
+                                </uui-button>` : 
+                                    html `<uui-button look="default" color="default" label="Collapse" @click=${() => this.toggleNode(node)}>
+                                    <uui-icon name="icon-arrow-down"></uui-icon>
+                                </uui-button>`}
+                                `
+                                : ''
+                            }
+
+                            <uui-button look="default" color="positive" label="Add">
+                                <uui-icon name="add"></uui-icon>
+                            </uui-button>
+
+                            <uui-button look="default" color="danger" label="Delete">
+                                <uui-icon name="delete"></uui-icon>
+                            </uui-button>
+                        </uui-action-bar>
+                    </div>
+          </div>
+          <ul class="children ${node.expanded ? 'expanded' : 'collapsed'}">
+              ${repeat(
+                node.children,
+                (child) => child.id,
+                (child) => this.renderNode(child)
+            )}
             </ul>
+            </li>
+            <!-- ${node.children.length > 0
+                ? html`
+                  <span class="collapse-toggle" @click=${() => this.toggleNode(node)}>
+                    ${node.expanded ? '▼' : '▶'}
+                  </span>
+                `
+                : html`<span class="collapse-toggle-placeholder"></span>`
+            }
+            ${node.label}
+            <ul class="children ${node.expanded ? 'expanded' : ''}">
+              ${repeat(
+                node.children,
+                (child) => child.id,
+                (child) => this.renderNode(child)
+            )}
+            </ul>
+          </li> -->
         `;
     }
 
-    render() {
+    render(): TemplateResult {
         return html`
-            <div>
-                I'm a property editor!
-                ${this.renderTreeNodes(this.treeData)}
-            </div>
+                <ul>
+                    ${repeat(
+                        this.tree,
+                        (node) => node.id,
+                        (node) => this.renderNode(node)
+                    )}
+                </ul>
         `;
+    }
+
+    onDragStart(event: DragEvent, node: TreeNode): void {
+        this.draggedNode = node;
+        event.dataTransfer?.setData('text/plain', node.id);
+        event.stopPropagation();
+    }
+
+    onDragEnter(event: DragEvent): void {
+        const target = event.currentTarget as HTMLElement;
+        target.classList.add('drop-target');
+    }
+
+    onDragLeave(event: DragEvent): void {
+        const target = event.currentTarget as HTMLElement;
+        target.classList.remove('drop-target');
+    }
+
+    onDrop(event: DragEvent, targetNode: TreeNode): void {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const target = event.currentTarget as HTMLElement;
+        target.classList.remove('drop-target');
+
+        if (this.draggedNode && this.draggedNode !== targetNode) {
+            this.moveNode(this.draggedNode, targetNode);
+            this.draggedNode = null;
+            this.requestUpdate();
+        }
+    }
+
+    moveNode(draggedNode: TreeNode, targetNode: TreeNode): void {
+        // Remove dragged node from its current position
+        this.removeNode(this.tree, draggedNode);
+
+        // Add dragged node to the new position
+        targetNode.children.push(draggedNode);
+    }
+
+    removeNode(tree: TreeNode[], nodeToRemove: TreeNode): boolean {
+        for (let i = 0; i < tree.length; i++) {
+            if (tree[i] === nodeToRemove) {
+                tree.splice(i, 1);
+                return true;
+            }
+            if (this.removeNode(tree[i].children, nodeToRemove)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    toggleNode(node: TreeNode): void {
+        node.expanded = !node.expanded;
+        this.requestUpdate();
     }
 }
 

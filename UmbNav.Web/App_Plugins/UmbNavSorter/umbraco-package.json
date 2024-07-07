@@ -1,0 +1,20 @@
+{
+    "$schema": "../../umbraco-package-schema.json",
+    "name": "Umbraco.Community.UmbNavSorter",
+    "version": "4.0.0",
+    "extensions": [
+        {
+            "type": "propertyEditorUi",
+            "alias": "Umbraco.Community.UmbNavSorter",
+            "name": "UmbNav (Sorter)",
+            "element": "/App_Plugins/UmbNavSorter/dist/client.js",
+            "elementName": "umbnav-sorter-property-editor-ui",
+            "meta": {
+                "label": "UmbNav (Sorter)",
+                "icon": "icon-sitemap",
+                "group": "pickers",
+                "propertyEditorSchemaAlias": "Umbraco.Plain.String"
+            }
+        }
+    ]
+}
