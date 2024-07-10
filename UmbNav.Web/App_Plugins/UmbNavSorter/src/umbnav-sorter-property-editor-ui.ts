@@ -2,75 +2,65 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorUiElement } from "@umbraco-cms/backoffice/extension-registry";
 import type { ExampleSorterGroup, ModelEntryType } from './sorter-group.js';
+import { Guid } from "guid-typescript";
 
-import './sorter-group.js';
+import './umbnav-group.js';
+import UmbNavGroup from './umbnav-group.js';
 
 @customElement('umbnav-sorter-property-editor-ui')
 export default class UmbNavSorterPropertyEditorUIElement extends LitElement implements UmbPropertyEditorUiElement {
     @property({ type: String })
     groupOneItems: ModelEntryType[] = [
 		{
-			name: 'Apple',
+			key: Guid.create().toString(),
+			label: 'Apple',
 			children: [
 				{
-					name: 'Juice',
+					key: Guid.create().toString(),
+					label: 'Juice',
 				},
 				{
-					name: 'Milk',
+					key: Guid.create().toString(),
+					label: 'Milk',
 				},
 			],
 		},
 		{
-			name: 'Banana',
+			key: Guid.create().toString(),
+			label: 'Banana',
 			children: [],
 		},
 		{
-			name: 'Pear',
+			key: Guid.create().toString(),
+			label: 'Pear',
 		},
 		{
-			name: 'Pineapple',
+			key: Guid.create().toString(),
+			label: 'Pineapple',
 		},
 		{
-			name: 'Lemon',
+			key: Guid.create().toString(),
+			label: 'Lemon',
 			children: [
 				{
-					name: 'Cola',
+					key: Guid.create().toString(),
+					label: 'Cola',
 				},
 				{
-					name: 'Pepsi',
+					key: Guid.create().toString(),
+					label: 'Pepsi',
 				},
 			],
-		},
-	];
-
-	groupTwoItems: ModelEntryType[] = [
-		{
-			name: 'DXP',
-		},
-		{
-			name: 'H5YR',
-		},
-		{
-			name: 'UUI',
 		},
 	];
 
     render() {
         return html`
-			<uui-box class="uui-text">
-				<div class="outer-wrapper">
-					<example-sorter-group
+<umbnav-group
 						.value=${this.groupOneItems}
 						@change=${(e: Event) => {
-							this.groupOneItems = (e.target as ExampleSorterGroup).value;
-						}}></example-sorter-group>
-					<example-sorter-group
-						.value=${this.groupTwoItems}
-						@change=${(e: Event) => {
-							this.groupTwoItems = (e.target as ExampleSorterGroup).value;
-						}}></example-sorter-group>
-				</div>
-			</uui-box>
+							this.groupOneItems = (e.target as UmbNavGroup).value;
+						}}></umbnav-group>
 		`;
     }
 
