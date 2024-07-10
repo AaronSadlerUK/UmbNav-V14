@@ -1,7 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorUiElement } from "@umbraco-cms/backoffice/extension-registry";
-import type { ExampleSorterGroup, ModelEntryType } from './sorter-group.js';
+import type { ModelEntryType } from './umbnav-group.js';
 import { Guid } from "guid-typescript";
 
 import './umbnav-group.js';
@@ -18,10 +18,23 @@ export default class UmbNavSorterPropertyEditorUIElement extends LitElement impl
 				{
 					key: Guid.create().toString(),
 					label: 'Juice',
+					children: [
+						{
+							key: Guid.create().toString(),
+							label: 'Juice',
+							children: []
+						},
+						{
+							key: Guid.create().toString(),
+							label: 'Milk',
+							children: []
+						},
+					]
 				},
 				{
 					key: Guid.create().toString(),
 					label: 'Milk',
+					children: []
 				},
 			],
 		},
@@ -33,10 +46,12 @@ export default class UmbNavSorterPropertyEditorUIElement extends LitElement impl
 		{
 			key: Guid.create().toString(),
 			label: 'Pear',
+			children: []
 		},
 		{
 			key: Guid.create().toString(),
 			label: 'Pineapple',
+			children: []
 		},
 		{
 			key: Guid.create().toString(),
@@ -45,10 +60,12 @@ export default class UmbNavSorterPropertyEditorUIElement extends LitElement impl
 				{
 					key: Guid.create().toString(),
 					label: 'Cola',
+					children: []
 				},
 				{
 					key: Guid.create().toString(),
 					label: 'Pepsi',
+					children: []
 				},
 			],
 		},

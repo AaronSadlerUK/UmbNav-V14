@@ -70,6 +70,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 				(item) => item.key,
 				(item) =>
 					html`
+					<uui-button-inline-create
+							></uui-button-inline-create>
 					<umbnav-item id="tree-item" name=${item.key} label=${item.label} ?expanded=${item.expanded} ?haschildren=${item.children?.length > 0 || false}	
 					@custom-event=${this.toggleNode}></umbnav-item>
 					</umbnav-item>
