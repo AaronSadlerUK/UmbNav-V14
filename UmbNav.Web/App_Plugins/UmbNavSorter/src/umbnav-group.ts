@@ -2,7 +2,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { Guid } from "guid-typescript";
 
 import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
@@ -12,7 +11,6 @@ export type ModelEntryType = {
 	label: string;
 	children: ModelEntryType[];
 	expanded?: boolean;
-	[key: string]: any; // Add index signature
 };
 
 @customElement('umbnav-group')
@@ -35,7 +33,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 			this.requestUpdate('value', oldValue);
 			// Fire an event for the parent to know that the model has changed.
 			this.dispatchEvent(new CustomEvent('change'));
-		}
+		},
 	});
 
 	@property({ type: Array, attribute: false })
@@ -48,12 +46,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 		this.#sorter.setModel(this._value);
 		this.requestUpdate('value', oldValue);
 	}
-
 	private _value?: ModelEntryType[];
-
-	_itemDraggedOver: ((e: DragEvent) => {
-		console.log("triggered");
-	}) | undefined
 
 	removeItem = (item: ModelEntryType) => {
 		this.value = this.value.filter((r) => r.key !== item.key);
@@ -64,6 +57,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     	this.value = this.value.map((item) => 
       		item.key === key ? { ...item, expanded } : item
     );
+
+	console.log(expanded, key)
 	}
 
 	override render() {
@@ -78,13 +73,9 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 					<uui-button-inline-create
 							></uui-button-inline-create>
 					<umbnav-item id="tree-item" name=${item.key} label=${item.label} ?expanded=${item.expanded} ?haschildren=${item.children?.length > 0 || false}	
-					@custom-event=${this.toggleNode}
-					@change=${(e: Event) => {
-							item.children = (e.target as UmbNavGroup).value;
-							alert("triggered");
-						}}></umbnav-item>
+					@custom-event=${this.toggleNode}></umbnav-item>
 					</umbnav-item>
-					<umbnav-group class="children expanded"
+					<umbnav-group class="children ${item.expanded ? 'expanded' : 'collapsed'}"
 						.value=${item.children ?? []}
 						@change=${(e: Event) => {
 							item.children = (e.target as UmbNavGroup).value;
