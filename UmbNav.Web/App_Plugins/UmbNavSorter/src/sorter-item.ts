@@ -6,18 +6,60 @@ import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 	@property({ type: String, reflect: true })
 	name: string = '';
+	@property({ type: String, reflect: true })
+	key: string = '';
+	@property({ type: Boolean, reflect: true })
+	expanded: boolean = false;
 
 	// TODO: Does it make any different to have this as a property?
 	@property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
 	umbDragPlaceholder = false;
 
+	toggleNode(isExpanded: boolean): void {
+		const event = new CustomEvent<{ expanded: boolean; key: string }>('custom-event', {
+			detail: { expanded: !isExpanded, key: this.key },
+			bubbles: true,
+			composed: true,
+		  });
+		  this.dispatchEvent(event);
+
+        this.expanded = !isExpanded;
+        this.requestUpdate();
+    }
+
 	override render() {
 		return html`
-			<div>
-				${this.name}
-				<img src="https://picsum.photos/seed/${this.name}/400/400" style="width:120px;" />
-				<slot name="action"></slot>
+					<div class="tree-node">
+			<span id="icon">
+				<uui-icon name="document"></uui-icon>
+			</span>
+			<div id="info">
+				<div id="name">
+					${this.name}
+				</div>
+				<!-- <span class="umbnav-badge">Includes Child Nodes</span> -->
 			</div>
+			<div id="buttons">
+				<uui-action-bar>
+						${this.expanded ? 
+							html `<uui-button look="default" color="default" label="Expand" @click=${() => this.toggleNode(this.expanded)}>
+							<uui-icon name="icon-arrow-up"></uui-icon>
+						</uui-button>` : 
+							html `<uui-button look="default" color="default" label="Collapse" @click=${() => this.toggleNode(this.expanded)}>
+							<uui-icon name="icon-arrow-down"></uui-icon>
+						</uui-button>`}
+
+					<uui-button look="default" color="positive" label="Add">
+						<uui-icon name="add"></uui-icon>
+					</uui-button>
+
+					<uui-button look="default" color="danger" label="Delete">
+						<uui-icon name="delete"></uui-icon>
+					</uui-button>
+				</uui-action-bar>
+			</div>
+			</div>
+
 			<slot></slot>
 		`;
 	}
@@ -27,10 +69,7 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 		css`
 			:host {
 				display: block;
-				padding: var(--uui-size-layout-1);
-				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
-				margin-bottom: 3px;
 			}
 			:host([drag-placeholder]) {
 				opacity: 0.2;
@@ -42,7 +81,53 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 				justify-content: space-between;
 			}
 
-			slot:not([name]) {
+
+			#icon {
+        display: flex;
+        font-size: 1.2em;
+        margin-left: var(--uui-size-2, 6px);
+        margin-right: var(--uui-size-1, 3px);
+    }
+
+    #info {
+        display: flex;
+        align-items: start;
+        justify-content: center;
+        height: 100%;
+        padding-left: var(--uui-size-2, 6px);
+    }
+
+    #name {
+        font-weight: 700;
+    }
+    
+    #name:hover {
+        font-weight: 700;
+        text-decoration: underline;
+        color: var(--uui-color-interactive-emphasis, #3544b1);
+    }
+			#buttons {
+        margin-left: auto;
+    }
+
+	.tree-node {
+      display: flex;
+      align-items: center;
+      padding: 5px 10px;
+      border: 1px solid var(--uui-color-border, #d8d7d9);
+      border-radius: 4px;
+      background-color: var(--uui-color-surface, #fff);
+      cursor: all-scroll;
+      transition: background-color 0.3s ease;
+      min-height: var(--uui-size-14);
+
+    }
+
+	.tree-node.dragging {
+      opacity: 0.5;
+    }
+
+			slot:not([key]) {
 				// go on new line:
 			}
 		`,

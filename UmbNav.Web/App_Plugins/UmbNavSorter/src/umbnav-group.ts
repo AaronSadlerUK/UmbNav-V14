@@ -72,15 +72,16 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 					html`
 					<uui-button-inline-create
 							></uui-button-inline-create>
-					<umbnav-item id="tree-item" name=${item.key} label=${item.label} ?expanded=${item.expanded} ?haschildren=${item.children?.length > 0 || false}	
+							item
+					<umbnav-item id="tree-item" name=${item.key} label=${item.label} ?expanded=${item.expanded}	
 					@custom-event=${this.toggleNode}></umbnav-item>
+						<umbnav-group class="children expanded"
+							.value=${item.children ?? [{}]}
+							@change=${(e: Event) => {
+								item.children = (e.target as UmbNavGroup).value;
+							}}>
+						</umbnav-group>
 					</umbnav-item>
-					<umbnav-group class="children ${item.expanded ? 'expanded' : 'collapsed'}"
-						.value=${item.children ?? []}
-						@change=${(e: Event) => {
-							item.children = (e.target as UmbNavGroup).value;
-						}}>
-					</umbnav-group>
 					`,
 			)}
 		</ul>

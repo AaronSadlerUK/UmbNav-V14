@@ -33,6 +33,7 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 	override render() {
 		return html`
 		<li>
+			${this.hasChildren}
 			<div class="tree-node">
 			<span id="icon">
 				<uui-icon name="document"></uui-icon>
@@ -45,7 +46,7 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 			</div>
 			<div id="buttons">
 				<uui-action-bar>
-			${(this.hasChildren)
+			<!-- ${(this.hasChildren)
 						? html`
 						${this.expanded ? 
 							html `<uui-button look="default" color="default" label="Expand" @click=${() => this.toggleNode(this.expanded)}>
@@ -56,7 +57,15 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 						</uui-button>`}
 						`
 						: ''
-					}
+					} -->
+
+					${this.expanded ? 
+							html `<uui-button look="default" color="default" label="Expand" @click=${() => this.toggleNode(this.expanded)}>
+							<uui-icon name="icon-arrow-up"></uui-icon>
+						</uui-button>` : 
+							html `<uui-button look="default" color="default" label="Collapse" @click=${() => this.toggleNode(this.expanded)}>
+							<uui-icon name="icon-arrow-down"></uui-icon>
+						</uui-button>`}
 
 					<uui-button look="default" color="positive" label="Add">
 						<uui-icon name="add"></uui-icon>
