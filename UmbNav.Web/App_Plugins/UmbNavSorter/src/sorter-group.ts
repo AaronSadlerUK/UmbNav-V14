@@ -35,7 +35,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 			this.dispatchEvent(new CustomEvent('change'));
 		},
 	});
-	
+
 	@property({ type: Boolean, reflect: true })
 	nested: boolean = false;
 
@@ -55,24 +55,44 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 		this.value = this.value.filter((r) => r.name !== item.name);
 	};
 
-	toggleNode(event: CustomEvent<{ expanded: boolean;  key: string }>) {
+	toggleNode(event: CustomEvent<{ expanded: boolean; key: string }>) {
+		console.log(this.value)
 		const { expanded, key } = event.detail;
-    	this.value = this.value.map((item) => 
-      		item.key === key ? { ...item, expanded } : item
-    );
-
-	console.log(expanded, key)
+		var newValue = this.updateExpandedInNested(this.value, key, expanded);
+		this.value = newValue;
 	}
+
+	updateExpandedInNested(arr: ModelEntryType[], key: string, expanded: boolean) {
+		return arr.map(item => {
+		  // If the current item's key matches, update its expanded property
+		  if (item.key === key) {
+			return { ...item, expanded: expanded };
+		  }
+	  
+		  // If the item has children, recursively search within them
+		  if (item.children && item.children.length > 0) {
+			const updatedChildren: ModelEntryType[] = this.updateExpandedInNested(item.children, key, expanded);
+			
+			// Only return a new object if children were updated
+			if (updatedChildren !== item.children) {
+			  return { ...item, children: updatedChildren };
+			}
+		  }
+	  
+		  // Return the original item if no changes were made
+		  return item;
+		});
+	  }
 
 	override render() {
 		return html`
 			<div class="sorter-container">
 				${repeat(
-					this.value,
-					// Note: ideally you have an unique identifier for each item, but for this example we use the `name` as identifier.
-					(item) => item.key,
-					(item) =>
-						html`
+			this.value,
+			// Note: ideally you have an unique identifier for each item, but for this example we use the `name` as identifier.
+			(item) => item.key,
+			(item) =>
+				html`
 						<example-sorter-item name=${item.name} key=${item.key} class="sorter-padding-bottom"
 						@custom-event=${this.toggleNode}>
 							<!-- <button slot="action" @click=${() => this.removeItem(item)}>Delete</button> -->
@@ -81,11 +101,11 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 							class="${item.expanded ? 'expanded' : 'collapsed'}"
 								.value=${item.children ?? []}
 								@change=${(e: Event) => {
-									item.children = (e.target as ExampleSorterGroup).value;
-								}}></example-sorter-group>
+						item.children = (e.target as ExampleSorterGroup).value;
+					}}></example-sorter-group>
 						</example-sorter-item>
 						`,
-				)}
+		)}
 				${this.nested ? this.renderPlaceholder() : ''}
 			</div>
 		`;
