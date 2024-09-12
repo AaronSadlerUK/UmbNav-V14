@@ -1,15 +1,14 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorUiElement } from "@umbraco-cms/backoffice/extension-registry";
-// import type { ModelEntryType } from './umbnav-group.js';
 import { Guid } from "guid-typescript";
 
-import './sorter-group.js';
-import type { ExampleSorterGroup, ModelEntryType } from './sorter-group.js';
+import './umbnav-group.js';
+import type { UmbNavGroup, ModelEntryType } from './umbnav-group.js';
 
 @customElement('umbnav-sorter-property-editor-ui')
 export default class UmbNavSorterPropertyEditorUIElement extends LitElement implements UmbPropertyEditorUiElement {
-    @property({ type: String })
+	@property({ type: Array })
     groupOneItems: ModelEntryType[] = [
 		{
 			key: Guid.create().toString(),
@@ -21,7 +20,7 @@ export default class UmbNavSorterPropertyEditorUIElement extends LitElement impl
 					children: [
 						{
 							key: Guid.create().toString(),
-							name: 'Juice',
+							name: 'Juice 2',
 							children: [],
 							expanded: false
 						},
@@ -36,7 +35,7 @@ export default class UmbNavSorterPropertyEditorUIElement extends LitElement impl
 				},
 				{
 					key: Guid.create().toString(),
-					name: 'Milk',
+					name: 'Milk 2',
 					children: [],
 					expanded: false
 				},
@@ -86,11 +85,11 @@ export default class UmbNavSorterPropertyEditorUIElement extends LitElement impl
         return html`
 
 <div class="outer-wrapper">
-					<example-sorter-group
+					<umbnav-group
 						.value=${this.groupOneItems}
 						@change=${(e: Event) => {
-							this.groupOneItems = (e.target as ExampleSorterGroup).value;
-						}}></example-sorter-group>
+							this.groupOneItems = (e.target as UmbNavGroup).value;
+						}}></umbnav-group>
 				</div>
 		`;
     }

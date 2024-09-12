@@ -7,20 +7,17 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 	@property({ type: String, reflect: true })
 	name: string = '';
 	@property({ type: String, reflect: true })
-	label: string = '';
+	key: string = '';
 	@property({ type: Boolean, reflect: true })
 	expanded: boolean = false;
-	@property({ type: Boolean, reflect: true })
-	hasChildren: boolean = false;
-	
 
 	// TODO: Does it make any different to have this as a property?
 	@property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
 	umbDragPlaceholder = false;
 
 	toggleNode(isExpanded: boolean): void {
-		const event = new CustomEvent<{ expanded: boolean; key: string }>('custom-event', {
-			detail: { expanded: !isExpanded, key: this.name },
+		const event = new CustomEvent<{ expanded: boolean; key: string }>('toggle-children-event', {
+			detail: { expanded: !isExpanded, key: this.key },
 			bubbles: true,
 			composed: true,
 		  });
@@ -32,34 +29,19 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 
 	override render() {
 		return html`
-		<li>
-			${this.hasChildren}
-			<div class="tree-node">
+					<div class="tree-node">
 			<span id="icon">
 				<uui-icon name="document"></uui-icon>
 			</span>
 			<div id="info">
 				<div id="name">
-					${this.label}
+					${this.name}
 				</div>
 				<!-- <span class="umbnav-badge">Includes Child Nodes</span> -->
 			</div>
 			<div id="buttons">
 				<uui-action-bar>
-			<!-- ${(this.hasChildren)
-						? html`
 						${this.expanded ? 
-							html `<uui-button look="default" color="default" label="Expand" @click=${() => this.toggleNode(this.expanded)}>
-							<uui-icon name="icon-arrow-up"></uui-icon>
-						</uui-button>` : 
-							html `<uui-button look="default" color="default" label="Collapse" @click=${() => this.toggleNode(this.expanded)}>
-							<uui-icon name="icon-arrow-down"></uui-icon>
-						</uui-button>`}
-						`
-						: ''
-					} -->
-
-					${this.expanded ? 
 							html `<uui-button look="default" color="default" label="Expand" @click=${() => this.toggleNode(this.expanded)}>
 							<uui-icon name="icon-arrow-up"></uui-icon>
 						</uui-button>` : 
@@ -77,17 +59,29 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 				</uui-action-bar>
 			</div>
 			</div>
-		</li>
+
+			<slot></slot>
 		`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-    :host {
-      margin: 0;
-      padding: 0;
-    }
+			:host {
+				display: flex;
+				flex-direction: column;
+				border-radius: var(--uui-border-radius);
+			}
+			:host([drag-placeholder]) {
+				opacity: 0.2;
+			}
+
+			div {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
 
 			#icon {
         display: flex;
@@ -98,10 +92,10 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 
     #info {
         display: flex;
-        align-items: start;
-        justify-content: center;
-        height: 100%;
         padding-left: var(--uui-size-2, 6px);
+		flex-grow: 1;
+		flex-shrink: 0;
+		flex-basis: auto;
     }
 
     #name {
@@ -113,9 +107,6 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
         text-decoration: underline;
         color: var(--uui-color-interactive-emphasis, #3544b1);
     }
-			#buttons {
-        margin-left: auto;
-    }
 
 	.tree-node {
       display: flex;
@@ -123,13 +114,16 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
       padding: 5px 10px;
       border: 1px solid var(--uui-color-border, #d8d7d9);
       border-radius: 4px;
-      margin-bottom: 5px;
       background-color: var(--uui-color-surface, #fff);
       cursor: all-scroll;
       transition: background-color 0.3s ease;
       min-height: var(--uui-size-14);
 
     }
+
+	.margin-left {
+		margin-left: var(--uui-size-space-5)
+	}
 
 	.tree-node.dragging {
       opacity: 0.5;
@@ -146,6 +140,6 @@ export default UmbNavItem;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umbnav-item-nested': UmbNavItem;
+		'umbnav-item': UmbNavItem;
 	}
 }
