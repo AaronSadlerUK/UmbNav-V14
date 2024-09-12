@@ -51,8 +51,9 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 	}
 	private _value?: ModelEntryType[];
 
-	removeItem = (item: ModelEntryType) => {
-		this.value = this.value.filter((r) => r.name !== item.name);
+	removeItem = (event: CustomEvent<{ key: string }>) => {
+		const { key } = event.detail;
+		this.value = this.value.filter((r) => r.key !== key);
 	};
 
 	toggleNode(event: CustomEvent<{ expanded: boolean; key: string }>) {
@@ -94,8 +95,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 			(item) =>
 				html`
 						<umbnav-item name=${item.name} key=${item.key} class="sorter-padding-bottom"
-						@toggle-children-event=${this.toggleNode}>
-							<!-- <button slot="action" @click=${() => this.removeItem(item)}>Delete</button> -->
+						@toggle-children-event=${this.toggleNode}
+						@remove-node-event=${this.removeItem}>
 							<umbnav-group
 							?nested=${true}
 							class="${item.expanded ? 'expanded' : 'collapsed'}"

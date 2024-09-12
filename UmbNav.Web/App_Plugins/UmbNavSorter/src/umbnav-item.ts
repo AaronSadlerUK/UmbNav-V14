@@ -27,6 +27,17 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
         this.requestUpdate();
     }
 
+	removeNode(): void {
+		const event = new CustomEvent<{ key: string }>('remove-node-event', {
+			detail: { key: this.key },
+			bubbles: true,
+			composed: true,
+		  });
+		  this.dispatchEvent(event);
+
+        this.requestUpdate();
+    }
+
 	override render() {
 		return html`
 					<div class="tree-node">
@@ -53,7 +64,7 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 						<uui-icon name="add"></uui-icon>
 					</uui-button>
 
-					<uui-button look="default" color="danger" label="Delete">
+					<uui-button look="default" color="danger" label="Delete" @click=${() => this.removeNode()}>
 						<uui-icon name="delete"></uui-icon>
 					</uui-button>
 				</uui-action-bar>
