@@ -16,6 +16,16 @@ import UmbNavItem from './umbnav-item.ts';
 export type ModelEntryType = {
     key: string;
     name: string;
+    description: string,
+    url: string,
+    icon: string,
+    itemType: string,
+    udi: string,
+    anchor: string,
+    published: boolean,
+    naviHide: boolean,
+    culture: string | null,
+    id: number,
     children?: ModelEntryType[];
     expanded: boolean;
 };
