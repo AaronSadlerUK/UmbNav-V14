@@ -97,12 +97,8 @@ export default class UmbNavSorterPropertyEditorUIElement extends LitElement impl
     static override styles = [
 		UmbTextStyles,
 		css`
-			:host {
-				display: block;
-			}
-
 			.outer-wrapper {
-				display: flex;
+				display: grid;
 				gap: var(--uui-size-layout-1);
 			}
 		`,
