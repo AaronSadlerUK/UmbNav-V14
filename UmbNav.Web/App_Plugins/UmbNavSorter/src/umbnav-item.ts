@@ -83,8 +83,8 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
         UmbTextStyles,
         css`
             :host {
-                display: flex;
-                flex-direction: column;
+                display: grid;
+                gap: 3px;
                 border-radius: var(--uui-border-radius);
             }
 
