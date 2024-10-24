@@ -7,6 +7,10 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     @property({type: String, reflect: true})
     name: string = '';
     @property({type: String, reflect: true})
+    description: string = '';
+    @property({type: String, reflect: true})
+    icon: string = '';
+    @property({type: String, reflect: true})
     key: string = '';
     @property({type: Boolean, reflect: true})
     expanded: boolean = false;
@@ -42,11 +46,16 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
         return html`
             <div class="tree-node">
 			<span id="icon">
-				<uui-icon name="document"></uui-icon>
+				<uui-icon name="${this.icon}"></uui-icon>
 			</span>
                 <div id="info">
-                    <div id="name">
-                        ${this.name}
+                    <div class="column">
+                        <div id="name">
+                            ${this.name}
+                        </div>
+                        <div id="description">
+                            ${this.description}
+                        </div>
                     </div>
                     <!-- <span class="umbnav-badge">Includes Child Nodes</span> -->
                 </div>
@@ -114,9 +123,20 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                 flex-basis: auto;
             }
 
+            #info .column {
+                flex-direction: column;
+                align-items: normal;
+            }
+
             #name {
                 font-weight: 700;
                 cursor: pointer;
+            }
+            
+            #description {
+                color: #515054;
+                font-size: 12px;
+                line-height: 1.5em;
             }
 
             #name:hover {
@@ -139,8 +159,8 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
             }
 
             .tree-node:hover {
-            border-color: var(--uui-color-border-emphasis, #a1a1a1);
-        }
+                border-color: var(--uui-color-border-emphasis, #a1a1a1);
+            }
 
             .margin-left {
                 margin-left: var(--uui-size-space-5)

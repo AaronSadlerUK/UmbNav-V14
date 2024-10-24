@@ -115,6 +115,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                 html`
                                     <uui-button-inline-create></uui-button-inline-create>
                                     <umbnav-item name=${item.name} key=${item.key} class=""
+                                                 description="${item.description}"
+                                                 icon="${item.icon}"
                                                  @toggle-children-event=${this.toggleNode}
                                                  @remove-node-event=${this.removeItem}>
                                         <umbnav-group
