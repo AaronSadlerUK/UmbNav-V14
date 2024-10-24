@@ -94,7 +94,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 			(item) => item.key,
 			(item) =>
 				html`
-						<umbnav-item name=${item.name} key=${item.key} class="sorter-padding-bottom"
+					<uui-button-inline-create></uui-button-inline-create>
+						<umbnav-item name=${item.name} key=${item.key} class=""
 						@toggle-children-event=${this.toggleNode}
 						@remove-node-event=${this.removeItem}>
 							<umbnav-group
@@ -107,12 +108,9 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 						</umbnav-item>
 						`,
 		)}
-				${this.nested ? this.renderPlaceholder() : ''}
+				<uui-button label="Add Menu Item" look="placeholder"></uui-button>
 			</div>
 		`;
-	}
-	renderPlaceholder(): TemplateResult {
-		return html`<div class="sorter-placeholder sorter-border">Drop items above to create children</div>`;
 	}
 
 	static override styles = [
@@ -126,8 +124,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 			}
 
 			.umbnav-container {
-				display: flex;
-				flex-direction: column;
+				display: grid;
+				gap: 1px;
 			}
 
 			.sorter-padding {
