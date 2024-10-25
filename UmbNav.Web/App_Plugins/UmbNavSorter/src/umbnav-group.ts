@@ -71,10 +71,22 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     private _value?: ModelEntryType[];
 
     removeItem = (event: CustomEvent<{ key: string }>) => {
-        const {key} = event.detail;
-        this.value = this.value.filter((r) => r.key !== key);
+        const { key } = event.detail;
+    
+        const removeItemRecursive = (list: any[], key: string): any[] => {
+            return list.filter((item) => {
+                if (item.key === key) {
+                    return false;
+                }
+                if (item.children) {
+                    item.children = removeItemRecursive(item.children, key);
+                }
+                return true;
+            });
+        };
+    
+        this.value = removeItemRecursive(this.value, key);
     };
-
     toggleNode(event: CustomEvent<{ expanded: boolean; key: string }>) {
         console.log(this.value)
         const {expanded, key} = event.detail;
