@@ -31,6 +31,17 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
         this.requestUpdate();
     }
 
+    editNode(key: string): void {
+        const event = new CustomEvent<{ key: string }>('edit-node-event', {
+            detail: {key: key},
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+
+        this.requestUpdate();
+    }
+
     removeNode(): void {
         const event = new CustomEvent<{ key: string }>('remove-node-event', {
             detail: {key: this.key},
@@ -50,7 +61,8 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 			</span>
                 <div id="info">
                     <div class="column">
-                        <div id="name">
+                        <div id="name" 
+                             @click=${() => this.editNode(this.key)}>
                             ${this.name}
                         </div>
                         <div id="description">
@@ -73,8 +85,9 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                                         <uui-icon name="icon-arrow-down"></uui-icon>
                                     </uui-button>`}
 
-                        <uui-button look="default" color="positive" label="Add">
-                            <uui-icon name="add"></uui-icon>
+                        <uui-button look="default" color="warning" label="Edit"
+                                    @click=${() => this.editNode(this.key)}>
+                            <uui-icon name="edit"></uui-icon>
                         </uui-button>
 
                         <uui-button look="default" color="danger" label="Delete" @click=${() => this.removeNode()}>
