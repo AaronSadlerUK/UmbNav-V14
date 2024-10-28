@@ -12,6 +12,7 @@ import {UmbSorterController} from '@umbraco-cms/backoffice/sorter';
 
 import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
+import {UmbLinkPickerLinkType} from "@umbraco-cms/backoffice/multi-url-picker";
 
 export type ModelEntryType = {
     key: string;
@@ -19,8 +20,8 @@ export type ModelEntryType = {
     description: string,
     url: string,
     icon: string,
-    itemType: string,
-    udi: string,
+    itemType: UmbLinkPickerLinkType,
+    udi: string | null,
     anchor: string,
     published: boolean,
     naviHide: boolean,
@@ -28,6 +29,7 @@ export type ModelEntryType = {
     id: number,
     children?: ModelEntryType[];
     expanded: boolean;
+    target?: string
 };
 
 @customElement('umbnav-group')
