@@ -24,7 +24,7 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
 			name: 'Apple',
 			description: '/apple/',
 			url: '/apple/',
-			icon: 'icon-smiley',
+			icon: 'icon-smiley color-pink',
 			itemType: 'link',
 			udi: 'umb://document/1234567890',
 			anchor: '',

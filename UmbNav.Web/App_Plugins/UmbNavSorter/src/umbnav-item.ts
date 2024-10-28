@@ -46,7 +46,7 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
         return html`
             <div class="tree-node">
 			<span id="icon">
-				<uui-icon name="${this.icon}"></uui-icon>
+				<umb-icon name="${this.icon}"></umb-icon>
 			</span>
                 <div id="info">
                     <div class="column">
