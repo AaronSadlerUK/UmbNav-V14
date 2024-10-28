@@ -237,7 +237,7 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
 </div>
 			<uui-button look="primary"
 			color="default"
-			label="Pick an icon"
+			label="Pick an link"
 			@click=${this._OpenIconPicker}></uui-button>
 
 			<umb-property-editor-ui-multi-url-picker></umb-property-editor-ui-multi-url-picker>
