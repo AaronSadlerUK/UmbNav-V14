@@ -31,9 +31,11 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
         this.requestUpdate();
     }
 
-    editNode(key: string): void {
-        const event = new CustomEvent<{ key: string }>('edit-node-event', {
-            detail: {key: key},
+    editNode(key: string | null | undefined): void {
+        const event = new CustomEvent<{ key:  string | null | undefined }>('edit-node-event', {
+            detail: {
+                key: key
+            },
             bubbles: true,
             composed: true,
         });
