@@ -83,8 +83,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     private _value?: ModelEntryType[];
 
     removeItem = (event: CustomEvent<{ key: string }>) => {
-        const { key } = event.detail;
-    
+        const {key} = event.detail;
+
         const removeItemRecursive = (list: any[], key: string): any[] => {
             return list.filter((item) => {
                 if (item.key === key) {
@@ -96,9 +96,10 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 return true;
             });
         };
-    
+
         this.value = removeItemRecursive(this.value, key);
     };
+
     toggleNode(event: CustomEvent<{ expanded: boolean; key: string }>) {
         console.log(this.value)
         const {expanded, key} = event.detail;
@@ -131,12 +132,22 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     toggleLinkPickerEvent(event: CustomEvent<{ key: string | null | undefined }>) {
         this.toggleLinkPicker(event.detail.key);
     }
-    async toggleLinkPicker(key: string | null | undefined) {
+
+    async toggleLinkPicker(key: string | null | undefined, parentKey?: string | null | undefined, siblingKey?: string | null | undefined) {
 
         try {
-            let item: UmbLinkPickerLink = { name: '', url: '', icon: '', type: null, target: '', published: false, unique: '', queryString: '' };
+            let item: UmbLinkPickerLink = {
+                name: '',
+                url: '',
+                icon: '',
+                type: null,
+                target: '',
+                published: false,
+                unique: '',
+                queryString: ''
+            };
             if (key != null) {
-                const umbNavItem =  this.findItemByKey(key, this.value);
+                const umbNavItem = this.findItemByKey(key, this.value);
                 console.log(umbNavItem);
                 item = this.convertToUmbLinkPickerLink(<ModelEntryType>umbNavItem);
                 console.log(item)
@@ -153,25 +164,65 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 }
             });
 
-            const data = await modalHandler?.onSubmit();
-            if (!data) return;
+            const result = await modalHandler.onSubmit().catch(() => undefined);
+            if (!result?.link) return;
 
-            console.log("modaldata:" + data)
+            console.log("modaldata:" + result.link)
 
-            this.addItem(this.convertToUmbNavLink(data.link));
+            let menuItem = result.link;
+
+            if (result.link.type === "external") {
+                menuItem = {
+                    ...menuItem,
+                    icon: "icon-link"
+                };
+            }
+
+            if (this.value.find(item => item.key === key)) {
+                this.updateItem(this.convertToUmbNavLink(menuItem, key));
+            } else {
+                this.addItem(this.convertToUmbNavLink(menuItem, null), parentKey, siblingKey);
+            }
 
             if (!modalHandler) return;
             this.#dispatchChangeEvent();
-        }
-        catch (error) {
+        } catch (error) {
             console.error(error);
         }
     }
 
-    addItem(newItem: ModelEntryType): void {
+    addItem(newItem: ModelEntryType, parentKey?: string | null | undefined, siblingKey?: string | null | undefined): void {
         let newValue = this.value;
-        newValue.push(newItem);
+
+        if (siblingKey) {
+            const siblingIndex = newValue.findIndex(item => item.key === siblingKey);
+            if (siblingIndex !== -1) {
+                newValue.splice(siblingIndex, 0, newItem);
+            } else {
+                newValue.push(newItem);
+            }
+        } else {
+            newValue.push(newItem);
+        }
+
         this.value = newValue;
+        this.requestUpdate(); // Notify LitElement to re-render
+    }
+
+    updateItem(updatedItem: ModelEntryType): void {
+        const updateItemRecursive = (list: ModelEntryType[], key: string): ModelEntryType[] => {
+            return list.map(item => {
+                if (item.key === key) {
+                    return {...item, ...updatedItem};
+                }
+                if (item.children) {
+                    item.children = updateItemRecursive(item.children, key);
+                }
+                return item;
+            });
+        };
+
+        this.value = updateItemRecursive(this.value, updatedItem.key!);
         this.requestUpdate(); // Notify LitElement to re-render
     }
 
@@ -203,17 +254,18 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         };
     }
 
-    convertToUmbNavLink(item: UmbLinkPickerLink): ModelEntryType {
+    convertToUmbNavLink(item: UmbLinkPickerLink, key: string | null | undefined): ModelEntryType {
         return {
-            key: Guid.create().toString(),
+            key: key ?? Guid.create().toString(),
             name: item.name,
             url: item.url,
             icon: item.icon,
             itemType: item.type,
             target: item.target,
             published: item.published,
-            udi: item.unique,
-            anchor: item.queryString
+            udi: item.unique != null && item.unique.length > 0 ? item.unique : null,
+            anchor: item.queryString,
+            description: item.url,
         };
     }
 
@@ -221,8 +273,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         this.dispatchEvent(new UmbPropertyValueChangeEvent());
     }
 
-    newNode(): void {
-        this.toggleLinkPicker(null);
+    newNode(parentKey?: string | null | undefined, siblingKey?: string | null | undefined): void {
+        this.toggleLinkPicker(null, parentKey, siblingKey);
         this.requestUpdate();
     }
 
@@ -236,7 +288,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                         (item) =>
                                 html`
                                     <uui-button-inline-create
-                                            @click=${() => this.newNode()}></uui-button-inline-create>
+                                            @click=${() => this.newNode(null, item.key)}></uui-button-inline-create>
                                     <umbnav-item name=${item.name} key=${item.key} class=""
                                                  description="${item.description}"
                                                  icon="${item.icon}"
@@ -273,7 +325,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 display: grid;
                 gap: 1px;
             }
-			
+
             .expanded {
                 display: flex;
             }
@@ -281,7 +333,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             .margin-left {
                 margin-left: var(--uui-size-space-5);
             }
-            
+
             .add-menuitem-button {
                 padding-top: 1px;
                 padding-bottom: 3px;
