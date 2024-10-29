@@ -1,21 +1,18 @@
 import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
-import {
-    css,
-    html,
-    customElement,
-    LitElement,
-    repeat,
-    property
-} from '@umbraco-cms/backoffice/external/lit';
+import {css, customElement, html, LitElement, property, repeat} from '@umbraco-cms/backoffice/external/lit';
 import {UmbElementMixin} from '@umbraco-cms/backoffice/element-api';
 import {UmbSorterController} from '@umbraco-cms/backoffice/sorter';
-import {UMB_LINK_PICKER_MODAL, UmbLinkPickerLink} from '@umbraco-cms/backoffice/multi-url-picker';
+import {
+    UMB_LINK_PICKER_MODAL,
+    UmbLinkPickerLink,
+    UmbLinkPickerLinkType
+} from '@umbraco-cms/backoffice/multi-url-picker';
 import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
-import {UmbLinkPickerLinkType} from "@umbraco-cms/backoffice/multi-url-picker";
 import {UMB_MODAL_MANAGER_CONTEXT} from '@umbraco-cms/backoffice/modal';
 import {Guid} from "guid-typescript";
 import {UmbPropertyValueChangeEvent} from "@umbraco-cms/backoffice/property-editor";
+import {DocumentService, MediaService} from '@umbraco-cms/backoffice/external/backend-api';
 
 export type ModelEntryType = {
     key: string | null | undefined;
@@ -178,6 +175,33 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 };
             }
 
+            if (result.link.type === "media") {
+                let media = await this.#getMedia(result.link.unique);
+
+                if (media != null) {
+                    menuItem = {
+                        ...menuItem,
+                        name: media.variants[0].name,
+                        icon: media.mediaType.icon,
+                        url: media.values.length > 0 ? (media.values[0].value as { src: string }).src : null,
+                    };
+                }
+            }
+
+            if (result.link.type === "document") {
+                let document = await this.#getDocument(result.link.unique);
+
+                if (document != null) {
+                    menuItem = {
+                        ...menuItem,
+                        name: document.variants[0].name,
+                        icon: document.documentType.icon,
+                        url: document.urls.length > 0 ? document.urls[0].url : null,
+                        published: document.variants[0].state === "Published"
+                    };
+                }
+            }
+
             if (this.value.find(item => item.key === key)) {
                 this.updateItem(this.convertToUmbNavLink(menuItem, key));
             } else {
@@ -278,6 +302,26 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         this.requestUpdate();
     }
 
+    async #getDocument(entityKey: string | undefined | null) {
+        if (!entityKey) return;
+        // Should this be done here or in the action file?
+        const data  = await DocumentService.getDocumentById({ id: entityKey });
+        if (!data) return;
+        //TODO How do we ensure we get the correct variant?
+        return data;
+
+    }
+
+    async #getMedia(entityKey: string | undefined | null) {
+        if (!entityKey) return;
+        // Should this be done here or in the action file?
+        const data  = await MediaService.getMediaById({ id: entityKey });
+        if (!data) return;
+        //TODO How do we ensure we get the correct variant?
+        return data;
+
+    }
+
     override render() {
         return html`
             <div class="umbnav-container ${this.nested ? 'margin-left' : ''}">
@@ -289,7 +333,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                 html`
                                     <uui-button-inline-create
                                             @click=${() => this.newNode(null, item.key)}></uui-button-inline-create>
-                                    <umbnav-item name=${item.name} key=${item.key} class=""
+                                    <umbnav-item name=${item.name} key=${item.key} class="${item.published === false && item.itemType != "media" ? 'unpublished' : ''}"
                                                  description="${item.description}"
                                                  icon="${item.icon}"
                                                  @toggle-children-event=${this.toggleNode}
@@ -341,6 +385,16 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
             .collapsed {
                 display: none;
+            }
+            
+            .unpublished {
+                border: 1px dashed red;
+                opacity: 0.6;
+            }
+
+            .unpublished:hover {
+                border: 1px dashed red;
+                opacity: 0.8;
             }
         `,
     ];
