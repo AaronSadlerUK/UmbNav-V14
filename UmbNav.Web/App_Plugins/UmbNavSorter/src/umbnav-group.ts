@@ -333,7 +333,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                 html`
                                     <uui-button-inline-create
                                             @click=${() => this.newNode(null, item.key)}></uui-button-inline-create>
-                                    <umbnav-item name=${item.name} key=${item.key} class="${item.published === false && item.itemType != "media" ? 'unpublished' : ''}"
+                                    <umbnav-item name=${item.name} key=${item.key} class="${item.published === false && item.itemType === "document" ? 'unpublished' : ''}"
                                                  description="${item.description}"
                                                  icon="${item.icon}"
                                                  @toggle-children-event=${this.toggleNode}
