@@ -9,10 +9,14 @@ import {
 } from '@umbraco-cms/backoffice/multi-url-picker';
 import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
-import {UMB_MODAL_MANAGER_CONTEXT} from '@umbraco-cms/backoffice/modal';
+import {
+    UMB_MODAL_MANAGER_CONTEXT,
+    UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
 import {Guid} from "guid-typescript";
 import {UmbPropertyValueChangeEvent} from "@umbraco-cms/backoffice/property-editor";
 import {DocumentService, MediaService} from '@umbraco-cms/backoffice/external/backend-api';
+import { TIME_CUSTOM_MODAL } from "./modals/custom-modal-token.ts";
 
 export type ModelEntryType = {
     key: string | null | undefined;
@@ -34,6 +38,8 @@ export type ModelEntryType = {
 
 @customElement('umbnav-group')
 export class UmbNavGroup extends UmbElementMixin(LitElement) {
+    #modalContext?: UmbModalManagerContext;
+
     //
     // Sorter setup:
     #sorter = new UmbSorterController<ModelEntryType, UmbNavItem>(this, {
@@ -73,7 +79,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     constructor() {
         super();
         this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (_instance) => {
-            // this._modalContext = _instance;
+            this.#modalContext = _instance;
         });
     }
 
@@ -128,6 +134,21 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         this.toggleLinkPicker(event.detail.key);
     }
 
+    async toggleTextModal() {
+        const customContext = this.#modalContext?.open(this, TIME_CUSTOM_MODAL, {
+            data: {
+                headline: 'A Custom modal',
+                content: 'Some content for the custom modal'
+            }
+        });
+
+        const data = await customContext?.onSubmit();
+
+        if (!data) return;
+
+        console.log('data', data);
+    }
+
     async toggleLinkPicker(key: string | null | undefined, parentKey?: string | null | undefined, siblingKey?: string | null | undefined) {
 
         try {
@@ -148,8 +169,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 console.log(item)
             }
 
-            const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-            const modalHandler = modalManager.open(this, UMB_LINK_PICKER_MODAL, {
+            const modalHandler = this.#modalContext?.open(this, UMB_LINK_PICKER_MODAL, {
                 data: {
                     config: {},
                     index: null,
@@ -159,7 +179,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 }
             });
 
-            const result = await modalHandler.onSubmit().catch(() => undefined);
+            const result = await modalHandler?.onSubmit().catch(() => undefined);
             if (!result?.link) return;
 
             console.log("modaldata:" + result.link)
@@ -351,8 +371,13 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                     </umbnav-item>
                                 `,
                 )}
-                <uui-button label="Add Menu Item" look="placeholder" class="add-menuitem-button"
-                            @click=${() => this.newNode()}></uui-button>
+
+                <uui-button-group>
+                    <uui-button label="Add Text Item" look="placeholder" class="add-menuitem-button"
+                                @click=${() => this.toggleTextModal()}></uui-button>
+                    <uui-button label="Add Link Item" look="placeholder" class="add-menuitem-button"
+                                @click=${() => this.newNode()}></uui-button>
+                </uui-button-group>
             </div>
         `;
     }
@@ -378,7 +403,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             //*********** */
             umbnav-group {
                 outline: 1px solid red;
-            } 
+            }
 
             .collapsed {
                 //display: none;
@@ -405,7 +430,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 padding-top: 1px;
                 padding-bottom: 3px;
             }
-           
+
             .unpublished {
                 border: 1px dashed red;
                 opacity: 0.6;
