@@ -1,27 +1,27 @@
-import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
-import {css, html, customElement, LitElement, property} from '@umbraco-cms/backoffice/external/lit';
-import {UmbElementMixin} from '@umbraco-cms/backoffice/element-api';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, html, customElement, LitElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 
 @customElement('umbnav-item')
 export class UmbNavItem extends UmbElementMixin(LitElement) {
-    @property({type: String, reflect: true})
+    @property({ type: String, reflect: true })
     name: string = '';
-    @property({type: String, reflect: true})
+    @property({ type: String, reflect: true })
     description: string = '';
-    @property({type: String, reflect: true})
+    @property({ type: String, reflect: true })
     icon: string = '';
-    @property({type: String, reflect: true})
+    @property({ type: String, reflect: true })
     key: string = '';
-    @property({type: Boolean, reflect: true})
+    @property({ type: Boolean, reflect: true })
     expanded: boolean = false;
 
     // TODO: Does it make any different to have this as a property?
-    @property({type: Boolean, reflect: true, attribute: 'drag-placeholder'})
+    @property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
     umbDragPlaceholder = false;
 
     toggleNode(isExpanded: boolean): void {
         const event = new CustomEvent<{ expanded: boolean; key: string }>('toggle-children-event', {
-            detail: {expanded: !isExpanded, key: this.key},
+            detail: { expanded: !isExpanded, key: this.key },
             bubbles: true,
             composed: true,
         });
@@ -32,7 +32,7 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     }
 
     editNode(key: string | null | undefined): void {
-        const event = new CustomEvent<{ key:  string | null | undefined }>('edit-node-event', {
+        const event = new CustomEvent<{ key: string | null | undefined }>('edit-node-event', {
             detail: {
                 key: key
             },
@@ -46,7 +46,7 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 
     removeNode(): void {
         const event = new CustomEvent<{ key: string }>('remove-node-event', {
-            detail: {key: this.key},
+            detail: { key: this.key },
             bubbles: true,
             composed: true,
         });
@@ -58,9 +58,13 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     override render() {
         return html`
             <div class="tree-node">
-			<span id="icon">
-				<umb-icon name="${this.icon}"></umb-icon>
-			</span>
+                <div id="arrow">
+                <uui-symbol-expand ?open="${this.expanded}"
+                @click=${() => this.toggleNode(this.expanded)}></uui-symbol-expand>
+                </div>
+			    <div id="icon">
+                    <umb-icon name="${this.icon}"></umb-icon>
+                </div>
                 <div id="info">
                     <div class="column">
                         <div id="name" 
@@ -75,24 +79,13 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                 </div>
                 <div id="buttons">
                     <uui-action-bar>
-                        ${this.expanded ?
-                                html`
-                                    <uui-button look="default" color="default" label="Expand"
-                                                @click=${() => this.toggleNode(this.expanded)}>
-                                        <uui-icon name="icon-arrow-up"></uui-icon>
-                                    </uui-button>` :
-                                html`
-                                    <uui-button look="default" color="default" label="Collapse"
-                                                @click=${() => this.toggleNode(this.expanded)}>
-                                        <uui-icon name="icon-arrow-down"></uui-icon>
-                                    </uui-button>`}
-
                         <uui-button look="default" color="warning" label="Edit"
                                     @click=${() => this.editNode(this.key)}>
                             <uui-icon name="edit"></uui-icon>
                         </uui-button>
 
-                        <uui-button look="default" color="danger" label="Delete" @click=${() => this.removeNode()}>
+                        <uui-button look="default" color="danger" label="Delete"
+                                    @click=${() => this.removeNode()}>
                             <uui-icon name="delete"></uui-icon>
                         </uui-button>
                     </uui-action-bar>
@@ -106,14 +99,22 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     static override styles = [
         UmbTextStyles,
         css`
+            :root {
+                    interpolate-size: allow-keywords;
+            }
             :host {
                 display: grid;
                 gap: 3px;
                 border-radius: var(--uui-border-radius);
+                
             }
 
             :host([drag-placeholder]) {
                 opacity: 0.2;
+            }
+
+            .expanded {
+                outline: 1px solid red;
             }
 
             div {
