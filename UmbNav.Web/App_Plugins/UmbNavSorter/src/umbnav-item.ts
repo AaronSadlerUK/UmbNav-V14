@@ -1,6 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umbnav-item')
 export class UmbNavItem extends UmbElementMixin(LitElement) {
@@ -55,6 +56,16 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
         this.requestUpdate();
     }
 
+    async requestDelete() {
+        await umbConfirmModal(this, {
+            headline: `Delete ${this.name}`,
+            content: `Are you sure you want to delete the "${this.name}" menu item?`,
+            confirmLabel: 'Delete',
+            color: 'danger',
+        });
+        this.removeNode();
+    }
+
     override render() {
         return html`
             <div class="tree-node">
@@ -85,7 +96,7 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                         </uui-button>
 
                         <uui-button look="default" label="Delete"
-                                    @click=${() => this.removeNode()}>
+                                    @click=${() => this.requestDelete()}>
                             <uui-icon name="delete"></uui-icon>
                         </uui-button>
                     </uui-action-bar>
