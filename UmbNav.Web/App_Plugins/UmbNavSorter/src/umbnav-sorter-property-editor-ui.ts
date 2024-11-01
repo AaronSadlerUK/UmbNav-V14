@@ -3,7 +3,6 @@ import {css, html, customElement, LitElement, property} from '@umbraco-cms/backo
 import {UmbPropertyEditorUiElement} from "@umbraco-cms/backoffice/property-editor";
 import {UmbElementMixin} from "@umbraco-cms/backoffice/element-api";
 import {Guid} from "guid-typescript";
-
 import './umbnav-group.js';
 import type {UmbNavGroup, ModelEntryType} from './umbnav-group.js';
 

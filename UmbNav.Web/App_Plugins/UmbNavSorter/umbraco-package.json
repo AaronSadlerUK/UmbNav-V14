@@ -15,6 +15,13 @@
                 "group": "pickers",
                 "propertyEditorSchemaAlias": "Umbraco.Plain.String"
             }
+        },
+        {
+            "type": "modal",
+            "alias": "time.custom.modal",
+            "name": "Time custom modal",
+            "element": "/App_Plugins/UmbNavSorter/dist/client.js",
+            "elementName": "time-custom-modal"
         }
     ]
 }
