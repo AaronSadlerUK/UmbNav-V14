@@ -149,7 +149,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         console.log('data', data);
     }
 
-    async toggleLinkPicker(key: string | null | undefined, parentKey?: string | null | undefined, siblingKey?: string | null | undefined) {
+    async toggleLinkPicker(key: string | null | undefined, siblingKey?: string | null | undefined) {
 
         try {
             let item: UmbLinkPickerLink = {
@@ -223,7 +223,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             if (this.value.find(item => item.key === key)) {
                 this.updateItem(this.convertToUmbNavLink(menuItem, key));
             } else {
-                this.addItem(this.convertToUmbNavLink(menuItem, null), parentKey, siblingKey);
+                this.addItem(this.convertToUmbNavLink(menuItem, null), siblingKey);
             }
 
             if (!modalHandler) return;
@@ -233,7 +233,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         }
     }
 
-    addItem(newItem: ModelEntryType, parentKey?: string | null | undefined, siblingKey?: string | null | undefined): void {
+    addItem(newItem: ModelEntryType, siblingKey?: string | null | undefined): void {
         let newValue = this.value;
 
         if (siblingKey) {
@@ -315,8 +315,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         this.dispatchEvent(new UmbPropertyValueChangeEvent());
     }
 
-    newNode(parentKey?: string | null | undefined, siblingKey?: string | null | undefined): void {
-        this.toggleLinkPicker(null, parentKey, siblingKey);
+    newNode(siblingKey?: string | null | undefined): void {
+        this.toggleLinkPicker(null, siblingKey);
         this.requestUpdate();
     }
 
@@ -354,7 +354,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                         (item) =>
                                 html`
                                     <uui-button-inline-create
-                                            @click=${() => this.newNode(null, item.key)}></uui-button-inline-create>
+                                            @click=${() => this.newNode(item.key)}></uui-button-inline-create>
                                     <umbnav-item name=${item.name} key=${item.key} class="${item.published === false && item.itemType === "document" ? 'unpublished' : ''}"
                                                  description="${item.description}"
                                                  icon="${item.icon}"
