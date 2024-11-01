@@ -115,6 +115,9 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                 justify-content: space-between;
             }
 
+            #arrow {
+                cursor: pointer;
+            }
 
             #icon {
                 display: flex;
