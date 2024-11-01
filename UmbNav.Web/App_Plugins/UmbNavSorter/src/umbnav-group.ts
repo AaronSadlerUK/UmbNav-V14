@@ -358,6 +358,9 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     static override styles = [
         UmbTextStyles,
         css`
+            :root {
+                interpolate-size: allow-keywords;
+            }
             :host {
                 display: flex;
                 flex-direction: column;
@@ -370,8 +373,20 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 gap: 1px;
             }
 
+            .collapsed {
+                block-size: 0;
+                overflow: clip;
+                visibility: hidden;
+                opacity: 0;
+                transition: block-size 0.5s ease, visibility 0.5s ease, opacity 0.5s ease;
+            }
+
             .expanded {
                 display: flex;
+                block-size: auto;
+                visibility: visible;
+                opacity: 1;
+                transition: block-size 0.5s ease, visibility 0.5s ease, opacity 0.5s ease;
             }
 
             .margin-left {

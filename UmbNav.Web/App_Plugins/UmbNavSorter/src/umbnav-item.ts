@@ -99,9 +99,6 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     static override styles = [
         UmbTextStyles,
         css`
-            :root {
-                    interpolate-size: allow-keywords;
-            }
             :host {
                 display: grid;
                 gap: 3px;
@@ -112,11 +109,6 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
             :host([drag-placeholder]) {
                 opacity: 0.2;
             }
-
-            .expanded {
-                outline: 1px solid red;
-            }
-
             div {
                 display: flex;
                 align-items: center;
