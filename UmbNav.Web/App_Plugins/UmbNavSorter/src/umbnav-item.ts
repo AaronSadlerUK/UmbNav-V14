@@ -79,12 +79,12 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                 </div>
                 <div id="buttons">
                     <uui-action-bar>
-                        <uui-button look="default" color="warning" label="Edit"
+                        <uui-button look="default" label="Edit"
                                     @click=${() => this.editNode(this.key)}>
                             <uui-icon name="edit"></uui-icon>
                         </uui-button>
 
-                        <uui-button look="default" color="danger" label="Delete"
+                        <uui-button look="default" label="Delete"
                                     @click=${() => this.removeNode()}>
                             <uui-icon name="delete"></uui-icon>
                         </uui-button>
@@ -137,6 +137,14 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
             #info .column {
                 flex-direction: column;
                 align-items: normal;
+            }
+
+            #buttons uui-action-bar {
+                opacity: 0;
+            }
+            #buttons:hover uui-action-bar{
+                opacity: 1;
+                transition: opacity 120ms;
             }
 
             #name {
