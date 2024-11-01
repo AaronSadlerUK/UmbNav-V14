@@ -98,10 +98,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     };
 
     toggleNode(event: CustomEvent<{ expanded: boolean; key: string }>) {
-        console.log(this.value)
         const {expanded, key} = event.detail;
-        var newValue = this.updateExpandedInNested(this.value, key, expanded);
-        this.value = newValue;
+        this.value = this.updateExpandedInNested(this.value, key, expanded);
     }
 
     updateExpandedInNested(arr: ModelEntryType[], key: string, expanded: boolean) {
