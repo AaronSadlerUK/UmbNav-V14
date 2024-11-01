@@ -320,6 +320,10 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
     }
 
+    firstUpdated() {
+        this.style.setProperty('interpolate-size', 'allow-keywords');
+    }
+
     override render() {
         return html`
             <div class="umbnav-container ${this.nested ? 'margin-left' : ''}">
@@ -371,7 +375,13 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 gap: 1px;
             }
 
+            //*********** */
+            umbnav-group {
+                outline: 1px solid red;
+            } 
+
             .collapsed {
+                //display: none;
                 block-size: 0;
                 overflow: clip;
                 visibility: hidden;
@@ -395,11 +405,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 padding-top: 1px;
                 padding-bottom: 3px;
             }
-
-            .collapsed {
-                display: none;
-            }
-            
+           
             .unpublished {
                 border: 1px dashed red;
                 opacity: 0.6;
