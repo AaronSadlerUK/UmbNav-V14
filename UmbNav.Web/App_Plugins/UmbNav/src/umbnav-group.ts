@@ -106,6 +106,9 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         };
 
         this.value = removeItemRecursive(this.value, key);
+
+        this.#dispatchChangeEvent();
+        this.requestUpdate();
     };
 
     toggleNode(event: CustomEvent<{ expanded: boolean; key: string }>) {
@@ -183,6 +186,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             menuItem.key = Guid.create().toString();
             this.addItem(menuItem);
         }
+
+        this.#dispatchChangeEvent();
     }
 
     async toggleLinkPicker(key: string | null | undefined, siblingKey?: string | null | undefined) {
