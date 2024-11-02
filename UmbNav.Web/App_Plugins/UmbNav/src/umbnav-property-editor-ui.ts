@@ -9,7 +9,7 @@ import {UmbElementMixin} from "@umbraco-cms/backoffice/element-api";
 import './umbnav-group.js';
 import type {UmbNavGroup, ModelEntryType} from './umbnav-group.js';
 
-@customElement('umbnav-sorter-property-editor-ui')
+@customElement('umbnav-property-editor-ui')
 export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElement) implements UmbPropertyEditorUiElement {
     @property()
     value: ModelEntryType[] | undefined;

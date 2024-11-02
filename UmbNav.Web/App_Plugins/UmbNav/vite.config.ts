@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
     build: {
         lib: {
-            entry: "src/umbnav-sorter-property-editor-ui.ts", // your web component source file
+            entry: "src/umbnav-property-editor-ui.ts", // your web component source file
             formats: ["es"],
         },
         outDir: "./dist", // all compiled files will be placed here
@@ -13,5 +13,5 @@ export default defineConfig({
             external: [/^@umbraco/], // ignore the Umbraco Backoffice package in the build
         },
     },
-    base: "/App_Plugins/UmbNavSorter/", // the base path of the app in the browser (used for assets)
+    base: "/App_Plugins/UmbNav/", // the base path of the app in the browser (used for assets)
 });

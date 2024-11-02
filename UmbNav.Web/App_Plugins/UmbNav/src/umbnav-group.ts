@@ -200,9 +200,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             };
             if (key != null) {
                 const umbNavItem = this.findItemByKey(key, this.value);
-                console.log(umbNavItem);
                 item = this.convertToUmbLinkPickerLink(<ModelEntryType>umbNavItem);
-                console.log(item)
             }
 
             const modalHandler = this.#modalContext?.open(this, UMB_LINK_PICKER_MODAL, {
@@ -268,7 +266,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     }
 
     addItem(newItem: ModelEntryType, siblingKey?: string | null | undefined): void {
-        let newValue = this.value;
+        let newValue = [...this.value];
 
         if (siblingKey) {
             const siblingIndex = newValue.findIndex(item => item.key === siblingKey);
@@ -322,6 +320,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             name: item.name,
             url: item.url,
             icon: item.icon,
+            // @ts-ignore
             type: item.itemType,
             target: item.target,
             published: item.published,
@@ -380,7 +379,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
     override render() {
         return html`
-            ${console.log(this.enableTextItems)}
             <div class="umbnav-container ${this.nested ? 'margin-left' : ''}">
                 ${repeat(
                         this.value,
