@@ -13,7 +13,23 @@
                 "label": "UmbNav (Sorter)",
                 "icon": "icon-sitemap",
                 "group": "pickers",
-                "propertyEditorSchemaAlias": "Umbraco.Plain.String"
+                "propertyEditorSchemaAlias": "Umbraco.Plain.String",
+                "settings": {
+                    "properties": [
+                        {
+                            "alias": "enableTextItems",
+                            "label": "Enable Text Items",
+                            "description": "If enabled text items can be added to the navigation.",
+                            "propertyEditorUiAlias": "Umb.PropertyEditorUi.Toggle"
+                        }
+                    ],
+                    "defaultData": [
+                        {
+                            "alias": "enableTextItems",
+                            "value": true
+                        }
+                    ]
+                }
             }
         },
         {

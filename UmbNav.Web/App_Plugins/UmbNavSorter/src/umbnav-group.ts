@@ -7,7 +7,10 @@ import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
 import {UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext,} from '@umbraco-cms/backoffice/modal';
 import {Guid} from "guid-typescript";
-import {UmbPropertyValueChangeEvent} from "@umbraco-cms/backoffice/property-editor";
+import {
+    UmbPropertyValueChangeEvent,
+    UmbPropertyEditorConfigProperty
+} from "@umbraco-cms/backoffice/property-editor";
 import {DocumentService, MediaService} from '@umbraco-cms/backoffice/external/backend-api';
 import {UMBNAV_TEXT_ITEM_MODAL} from "./modals/text-item-modal-token.ts";
 import {UmbNavLinkPickerLinkType} from "./umbnav.token.ts";
@@ -55,12 +58,20 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         },
     });
 
+    @property({ type: Array })
+    config: Array<UmbPropertyEditorConfigProperty> = [];
+
     @property({type: Boolean, reflect: true})
     nested: boolean = false;
 
     @property({type: Array, attribute: false})
     public get value(): ModelEntryType[] {
         return this._value ?? [];
+    }
+
+    @property({type: Boolean, attribute: false})
+    public get enableTextItems(): Boolean {
+        return <Boolean>this.config.find(item => item.alias === 'enableTextItems')?.value ?? false;
     }
 
     public set value(value: ModelEntryType[]) {
@@ -369,6 +380,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
     override render() {
         return html`
+            ${console.log(this.enableTextItems)}
             <div class="umbnav-container ${this.nested ? 'margin-left' : ''}">
                 ${repeat(
                         this.value,
@@ -397,8 +409,10 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 )}
 
                 <uui-button-group>
+                    ${this.enableTextItems ? html`
                     <uui-button label="Add Text Item" look="placeholder" class="add-menuitem-button"
                                 @click=${() => this.toggleTextModal(null)}></uui-button>
+                    ` : ''}
                     <uui-button label="Add Link Item" look="placeholder" class="add-menuitem-button"
                                 @click=${() => this.newNode()}></uui-button>
                 </uui-button-group>

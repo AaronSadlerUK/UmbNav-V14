@@ -1,6 +1,10 @@
 import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
 import {css, html, customElement, LitElement, property} from '@umbraco-cms/backoffice/external/lit';
-import {UmbPropertyEditorUiElement} from "@umbraco-cms/backoffice/property-editor";
+import {
+    UmbPropertyEditorConfigCollection,
+    UmbPropertyEditorUiElement,
+    UmbPropertyValueChangeEvent
+} from "@umbraco-cms/backoffice/property-editor";
 import {UmbElementMixin} from "@umbraco-cms/backoffice/element-api";
 import {Guid} from "guid-typescript";
 import './umbnav-group.js';
@@ -192,15 +196,16 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
             expanded: false
         },
     ];
+    @property({ attribute: false })
+    config: UmbPropertyEditorConfigCollection | undefined;
 
     render() {
         return html`
             <div class="outer-wrapper">
                 <umbnav-group
-                        .value=${this.groupOneItems}
-                        @change=${(e: Event) => {
-                            this.groupOneItems = (e.target as UmbNavGroup).value;
-                        }}></umbnav-group>
+                        .config=${this.config}
+                        .value=${this.value}
+                        @change=${this.onChange}></umbnav-group>
             </div>
         `;
     }
