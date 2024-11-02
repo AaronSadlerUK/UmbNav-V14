@@ -15,6 +15,8 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     key: string = '';
     @property({ type: Boolean, reflect: true })
     expanded: boolean = false;
+    @property({ type: Boolean, reflect: true })
+    unpublished: boolean = false;
 
     // TODO: Does it make any different to have this as a property?
     @property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
@@ -68,7 +70,7 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 
     override render() {
         return html`
-            <div class="tree-node">
+            <div class="tree-node ${this.unpublished ? 'unpublished' : ''}">
                 <div id="arrow">
                 <uui-symbol-expand ?open="${this.expanded}"
                 @click=${() => this.toggleNode(this.expanded)}></uui-symbol-expand>
@@ -198,6 +200,16 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 
             .tree-node.dragging {
                 opacity: 0.5;
+            }
+
+            .unpublished {
+                border: 1px dashed red;
+                opacity: 0.6;
+            }
+
+            .unpublished:hover {
+                border: 1px dashed red;
+                opacity: 0.8;
             }
 
             slot:not([key]) {

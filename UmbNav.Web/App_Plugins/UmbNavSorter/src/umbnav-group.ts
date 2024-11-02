@@ -355,9 +355,10 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                 html`
                                     <uui-button-inline-create
                                             @click=${() => this.newNode(item.key)}></uui-button-inline-create>
-                                    <umbnav-item name=${item.name} key=${item.key} class="${item.published === false && item.itemType === "document" ? 'unpublished' : ''}"
+                                    <umbnav-item name=${item.name} key=${item.key} class=""
                                                  description="${item.description}"
                                                  icon="${item.icon}"
+                                                 ?unpublished=${!item.published && item.itemType === "document"}
                                                  @toggle-children-event=${this.toggleNode}
                                                  @edit-node-event=${this.toggleLinkPickerEvent}
                                                  @remove-node-event=${this.removeItem}>
@@ -429,16 +430,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             .add-menuitem-button {
                 padding-top: 1px;
                 padding-bottom: 3px;
-            }
-
-            .unpublished {
-                border: 1px dashed red;
-                opacity: 0.6;
-            }
-
-            .unpublished:hover {
-                border: 1px dashed red;
-                opacity: 0.8;
             }
         `,
     ];
