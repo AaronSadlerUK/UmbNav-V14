@@ -2,21 +2,15 @@ import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
 import {css, customElement, html, LitElement, property, repeat} from '@umbraco-cms/backoffice/external/lit';
 import {UmbElementMixin} from '@umbraco-cms/backoffice/element-api';
 import {UmbSorterController} from '@umbraco-cms/backoffice/sorter';
-import {
-    UMB_LINK_PICKER_MODAL,
-    UmbLinkPickerLink,
-    UmbLinkPickerLinkType
-} from '@umbraco-cms/backoffice/multi-url-picker';
+import {UMB_LINK_PICKER_MODAL, UmbLinkPickerLink,} from '@umbraco-cms/backoffice/multi-url-picker';
 import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
-import {
-    UMB_MODAL_MANAGER_CONTEXT,
-    UmbModalManagerContext,
-} from '@umbraco-cms/backoffice/modal';
+import {UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext,} from '@umbraco-cms/backoffice/modal';
 import {Guid} from "guid-typescript";
 import {UmbPropertyValueChangeEvent} from "@umbraco-cms/backoffice/property-editor";
 import {DocumentService, MediaService} from '@umbraco-cms/backoffice/external/backend-api';
-import { TIME_CUSTOM_MODAL } from "./modals/custom-modal-token.ts";
+import {UMBNAV_TEXT_ITEM_MODAL} from "./modals/text-item-modal-token.ts";
+import {UmbNavLinkPickerLinkType} from "./umbnav.token.ts";
 
 export type ModelEntryType = {
     key: string | null | undefined;
@@ -24,7 +18,7 @@ export type ModelEntryType = {
     description?: string | null | undefined,
     url: string | null | undefined,
     icon: string | null | undefined,
-    itemType: UmbLinkPickerLinkType | null | undefined,
+    itemType: UmbNavLinkPickerLinkType | null | undefined,
     udi: string | null | undefined,
     anchor: string | null | undefined,
     published: boolean | null | undefined,
@@ -131,14 +125,35 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     }
 
     toggleLinkPickerEvent(event: CustomEvent<{ key: string | null | undefined }>) {
-        this.toggleLinkPicker(event.detail.key);
+        if (this.value.find(item => item.key === event.detail.key && item.itemType === "title")) {
+            this.toggleTextModal(event.detail.key);
+        } else {
+            this.toggleLinkPicker(event.detail.key);
+        }
     }
 
-    async toggleTextModal() {
-        const customContext = this.#modalContext?.open(this, TIME_CUSTOM_MODAL, {
+    async toggleTextModal(key: string | null | undefined) {
+        let item: ModelEntryType = {
+            key: key,
+            name: '',
+            itemType: 'title',
+            icon: 'icon-tag',
+            published: true,
+            udi: null,
+            url: null,
+            anchor: null,
+            description: null,
+        }
+
+        if (key != null) {
+            item = this.findItemByKey(key, this.value) as ModelEntryType;
+        }
+
+        const customContext = this.#modalContext?.open(this, UMBNAV_TEXT_ITEM_MODAL, {
             data: {
-                headline: 'A Custom modal',
-                content: 'Some content for the custom modal'
+                key: key,
+                headline: 'Add text item',
+                name: item.name
             }
         });
 
@@ -146,7 +161,16 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
         if (!data) return;
 
-        console.log('data', data);
+        let menuItem: ModelEntryType = {
+            ...data,
+        };
+
+        if (this.value.find(item => item.key === key)) {
+            this.updateItem(menuItem);
+        } else {
+            menuItem.key = Guid.create().toString();
+            this.addItem(menuItem);
+        }
     }
 
     async toggleLinkPicker(key: string | null | undefined, siblingKey?: string | null | undefined) {
@@ -180,9 +204,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             });
 
             const result = await modalHandler?.onSubmit().catch(() => undefined);
+            if (!modalHandler) return;
             if (!result?.link) return;
-
-            console.log("modaldata:" + result.link)
 
             let menuItem = result.link;
 
@@ -226,7 +249,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 this.addItem(this.convertToUmbNavLink(menuItem, null), siblingKey);
             }
 
-            if (!modalHandler) return;
             this.#dispatchChangeEvent();
         } catch (error) {
             console.error(error);
@@ -375,7 +397,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
                 <uui-button-group>
                     <uui-button label="Add Text Item" look="placeholder" class="add-menuitem-button"
-                                @click=${() => this.toggleTextModal()}></uui-button>
+                                @click=${() => this.toggleTextModal(null)}></uui-button>
                     <uui-button label="Add Link Item" look="placeholder" class="add-menuitem-button"
                                 @click=${() => this.newNode()}></uui-button>
                 </uui-button-group>

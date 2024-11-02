@@ -18,10 +18,10 @@
         },
         {
             "type": "modal",
-            "alias": "time.custom.modal",
-            "name": "Time custom modal",
+            "alias": "umbnav.text.item.modal",
+            "name": "UmbNav (Text Item Modal)",
             "element": "/App_Plugins/UmbNavSorter/dist/client.js",
-            "elementName": "time-custom-modal"
+            "elementName": "umbnav-text-item-modal"
         }
     ]
 }
