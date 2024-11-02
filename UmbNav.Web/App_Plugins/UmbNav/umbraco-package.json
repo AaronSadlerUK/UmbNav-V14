@@ -1,0 +1,53 @@
+{
+    "$schema": "../../umbraco-package-schema.json",
+    "name": "Umbraco.Community.UmbNav",
+    "version": "4.0.0",
+    "extensions": [
+        {
+            "type": "propertyEditorUi",
+            "alias": "Umbraco.Community.UmbNav",
+            "name": "UmbNav",
+            "element": "/App_Plugins/UmbNav/dist/client.js",
+            "elementName": "umbnav-property-editor-ui",
+            "meta": {
+                "label": "UmbNav",
+                "icon": "icon-sitemap",
+                "group": "pickers",
+                "propertyEditorSchemaAlias": "Umbraco.Plain.String",
+                "settings": {
+                    "properties": [
+                        {
+                            "alias": "enableTextItems",
+                            "label": "Enable Text Items",
+                            "description": "If enabled text items can be added to the navigation.",
+                            "propertyEditorUiAlias": "Umb.PropertyEditorUi.Toggle"
+                        },
+                        {
+                            "alias": "enableToggleAllButton",
+                            "label": "Enable Toggle All Items Button",
+                            "description": "If enabled a button will be displayed to toggle all items.",
+                            "propertyEditorUiAlias": "Umb.PropertyEditorUi.Toggle"
+                        }
+                    ],
+                    "defaultData": [
+                        {
+                            "alias": "enableTextItems",
+                            "value": true
+                        },
+                        {
+                            "alias": "enableToggleAllButton",
+                            "value": true
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "modal",
+            "alias": "umbnav.text.item.modal",
+            "name": "UmbNav (Text Item Modal)",
+            "element": "/App_Plugins/UmbNav/dist/client.js",
+            "elementName": "umbnav-text-item-modal"
+        }
+    ]
+}
