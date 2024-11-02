@@ -25,8 +25,6 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     toggleNode(isExpanded: boolean): void {
         const event = new CustomEvent<{ expanded: boolean; key: string }>('toggle-children-event', {
             detail: { expanded: !isExpanded, key: this.key },
-            bubbles: true,
-            composed: true,
         });
         this.dispatchEvent(event);
 
@@ -39,8 +37,6 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
             detail: {
                 key: key
             },
-            bubbles: true,
-            composed: true,
         });
         this.dispatchEvent(event);
 
@@ -50,8 +46,6 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     removeNode(): void {
         const event = new CustomEvent<{ key: string }>('remove-node-event', {
             detail: { key: this.key },
-            bubbles: true,
-            composed: true,
         });
         this.dispatchEvent(event);
 

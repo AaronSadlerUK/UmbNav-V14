@@ -161,6 +161,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
         if (!data) return;
 
+        // @ts-ignore
         let menuItem: ModelEntryType = {
             ...data,
         };
