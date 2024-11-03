@@ -241,6 +241,13 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 }
             }
 
+            if (result.link.type === null) {
+                menuItem = {
+                    ...menuItem,
+                    icon: "icon-unlink"
+                };
+            }
+
             if (this.value.find(item => item.key === key)) {
                 this.updateItem(this.convertToUmbNavLink(menuItem, key));
             } else {
