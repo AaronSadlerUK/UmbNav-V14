@@ -41,7 +41,6 @@ export class UmbNavModalElement extends
                 itemType: 'title',
                 udi: null,
                 anchor: null,
-                published: true,
                 children: []};
             this.modalContext?.submit();
         }, () => {

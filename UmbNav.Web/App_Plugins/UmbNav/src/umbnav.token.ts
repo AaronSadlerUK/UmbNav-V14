@@ -8,10 +8,8 @@ export type ModelEntryType = {
     itemType: UmbNavLinkPickerLinkType | null | undefined,
     udi: string | null | undefined,
     anchor: string | null | undefined,
-    published: boolean | null | undefined,
     naviHide?: boolean | null | undefined,
     culture?: string | null | undefined,
-    id?: number | null | undefined,
     children: ModelEntryType[];
     expanded?: boolean;
     target?: string | null | undefined

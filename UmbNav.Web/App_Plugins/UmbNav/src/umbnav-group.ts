@@ -132,7 +132,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             name: '',
             itemType: 'title',
             icon: 'icon-tag',
-            published: true,
             udi: null,
             url: null,
             anchor: null,
@@ -312,7 +311,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             // @ts-ignore
             type: item.itemType,
             target: item.target,
-            published: item.published,
             unique: item.udi,
             queryString: item.anchor
         };
@@ -326,7 +324,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             icon: item.icon,
             itemType: item.type,
             target: item.target,
-            published: item.published,
             udi: item.unique != null && item.unique.length > 0 ? item.unique : null,
             anchor: item.queryString,
             description: item.url,
