@@ -404,6 +404,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                                 ?nested=${true}
                                                 class="${item.expanded ? 'expanded' : 'collapsed'}"
                                                 .value=${item.children ?? []}
+                                                .config=${this.config}
                                                 @change=${(e: Event) => {
                                                     item.children = (e.target as UmbNavGroup).value;
                                                 }}></umbnav-group>
