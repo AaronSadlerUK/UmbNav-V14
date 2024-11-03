@@ -13,7 +13,7 @@ import {
 } from "@umbraco-cms/backoffice/property-editor";
 import {DocumentService, MediaService} from '@umbraco-cms/backoffice/external/backend-api';
 import {UMBNAV_TEXT_ITEM_MODAL} from "./modals/text-item-modal-token.ts";
-import {ModelEntryType} from "./umbnav.token.ts";
+import {UmbNavType} from "./umbnav.token.ts";
 
 @customElement('umbnav-group')
 export class UmbNavGroup extends UmbElementMixin(LitElement) {
@@ -21,7 +21,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
     //
     // Sorter setup:
-    #sorter = new UmbSorterController<ModelEntryType, UmbNavItem>(this, {
+    #sorter = new UmbSorterController<UmbNavType, UmbNavItem>(this, {
         getUniqueOfElement: (element) => {
             return element.key;
         },
@@ -46,7 +46,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     nested: boolean = false;
 
     @property({type: Array, attribute: false})
-    public get value(): ModelEntryType[] {
+    public get value(): UmbNavType[] {
         return this._value ?? [];
     }
 
@@ -55,7 +55,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         return <Boolean>this.config.find(item => item.alias === 'enableTextItems')?.value ?? false;
     }
 
-    public set value(value: ModelEntryType[]) {
+    public set value(value: UmbNavType[]) {
         const oldValue = this._value;
         this._value = value;
         this.#sorter.setModel(this._value);
@@ -70,7 +70,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     }
 
     @state()
-    private _value?: ModelEntryType[];
+    private _value?: UmbNavType[];
 
     removeItem = (event: CustomEvent<{ key: string }>) => {
         const {key} = event.detail;
@@ -96,7 +96,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         this.value = this.updateExpandedInNested(this.value, key, expanded);
     }
 
-    updateExpandedInNested(arr: ModelEntryType[], key: string, expanded: boolean) {
+    updateExpandedInNested(arr: UmbNavType[], key: string, expanded: boolean) {
         return arr.map(item => {
             // If the current item's key matches, update its expanded property
             if (item.key === key) {
@@ -105,7 +105,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
             // If the item has children, recursively search within them
             if (item.children && item.children.length > 0) {
-                const updatedChildren: ModelEntryType[] = this.updateExpandedInNested(item.children, key, expanded);
+                const updatedChildren: UmbNavType[] = this.updateExpandedInNested(item.children, key, expanded);
 
                 // Only return a new object if children were updated
                 if (updatedChildren !== item.children) {
@@ -127,7 +127,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     }
 
     async toggleTextModal(key: string | null | undefined) {
-        let item: ModelEntryType = {
+        let item: UmbNavType = {
             key: key,
             name: '',
             itemType: 'title',
@@ -140,7 +140,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         }
 
         if (key != null) {
-            item = this.findItemByKey(key, this.value) as ModelEntryType;
+            item = this.findItemByKey(key, this.value) as UmbNavType;
         }
 
         const modalHandler = this.#modalContext?.open(this, UMBNAV_TEXT_ITEM_MODAL, {
@@ -156,7 +156,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         if (!data) return;
 
         // @ts-ignore
-        let menuItem: ModelEntryType = {
+        let menuItem: UmbNavType = {
             ...data,
         };
 
@@ -183,7 +183,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             };
             if (key != null) {
                 const umbNavItem = this.findItemByKey(key, this.value);
-                item = this.convertToUmbLinkPickerLink(<ModelEntryType>umbNavItem);
+                item = this.convertToUmbLinkPickerLink(<UmbNavType>umbNavItem);
             }
 
             const modalHandler = this.#modalContext?.open(this, UMB_LINK_PICKER_MODAL, {
@@ -215,9 +215,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 if (media != null) {
                     menuItem = {
                         ...menuItem,
-                        name: menuItem.name ? menuItem.name : media.variants[0].name,
-                        icon: media.mediaType.icon,
-                        url: media.values.length > 0 ? (media.values[0].value as { src: string }).src : null,
+                        name: menuItem.name ? menuItem.name : null
                     };
                 }
             }
@@ -228,10 +226,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 if (document != null) {
                     menuItem = {
                         ...menuItem,
-                        name: menuItem.name ? menuItem.name : document.variants[0].name,
-                        icon: document.documentType.icon,
-                        url: document.urls.length > 0 ? document.urls[0].url : null,
-                        published: document.variants[0].state === "Published"
+                        name: menuItem.name ? menuItem.name : null
                     };
                 }
             }
@@ -253,7 +248,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         }
     }
 
-    addItem(newItem: ModelEntryType, siblingKey?: string | null | undefined): void {
+    addItem(newItem: UmbNavType, siblingKey?: string | null | undefined): void {
         let newValue = [...this.value];
 
         if (siblingKey) {
@@ -271,14 +266,14 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         this.#dispatchChangeEvent();
     }
 
-    updateItem(updatedItem: ModelEntryType): void {
-        const updateItemRecursive = (list: ModelEntryType[], key: string): ModelEntryType[] => {
+    updateItem(updatedItem: UmbNavType): void {
+        const updateItemRecursive = (list: UmbNavType[], key: string): UmbNavType[] => {
             return list.map(item => {
                 if (item.key === key) {
                     return {...item, ...updatedItem};
                 }
                 if (item.children) {
-                    item.children = updateItemRecursive(item.children, key);
+                    item = {...item, children: updateItemRecursive(item.children, key)};
                 }
                 return item;
             });
@@ -288,7 +283,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         this.#dispatchChangeEvent();
     }
 
-    findItemByKey(key: string, items: ModelEntryType[]): ModelEntryType | undefined {
+    findItemByKey(key: string, items: UmbNavType[]): UmbNavType | undefined {
         for (const item of items) {
             if (item.key === key) {
                 return item;
@@ -303,7 +298,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         return undefined;
     }
 
-    convertToUmbLinkPickerLink(item: ModelEntryType): UmbLinkPickerLink {
+    convertToUmbLinkPickerLink(item: UmbNavType): UmbLinkPickerLink {
         return {
             name: item.name,
             url: item.url,
@@ -316,7 +311,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         };
     }
 
-    convertToUmbNavLink(item: UmbLinkPickerLink, key: string | null | undefined): ModelEntryType {
+    convertToUmbNavLink(item: UmbLinkPickerLink, key: string | null | undefined): UmbNavType {
         return {
             key: key ?? uuidv4().replace(/-/g, ''),
             name: item.name,
@@ -331,7 +326,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         };
     }
 
-    #dispatchChangeEvent() {
+    async #dispatchChangeEvent() {
+        await this.#getMenuItemInfo(this._value);
         this.dispatchEvent(new UmbPropertyValueChangeEvent());
     }
 
@@ -360,7 +356,74 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
     }
 
-    firstUpdated() {
+    async #getMenuItemInfo(menuItems: UmbNavType[] | undefined) {
+        if (!menuItems) return;
+
+        let newValue = [...menuItems];
+        const processedUdis = new Set<string>();
+
+        for (let i = 0; i < newValue.length; i++) {
+            let element = newValue[i];
+            if (element.udi && processedUdis.has(element.udi)) {
+                continue;
+            }
+
+            if (element.itemType === 'media') {
+                let media = await this.#getMedia(element.udi);
+
+                if (media != null) {
+                    newValue = newValue.map(item => {
+                        if (item.udi === element.udi) {
+                            return {
+                                ...item,
+                                name: item.name ? item.name : media.variants[0].name,
+                                icon: media.mediaType.icon,
+                                description: media.values.length > 0 ? (media.values[0].value as {
+                                    src: string
+                                }).src : null,
+                                url: media.values.length > 0 ? (media.values[0].value as { src: string }).src : null
+                            };
+                        }
+                        return item;
+                    });
+                    if (element.udi != null) {
+                        processedUdis.add(element.udi);
+                    }
+                }
+            } else if (element.itemType === 'document') {
+                let document = await this.#getDocument(element.udi);
+
+                if (document != null) {
+                    newValue = newValue.map(item => {
+                        if (item.udi === element.udi) {
+                            return {
+                                ...item,
+                                name: item.name ? item.name : document.variants[0].name,
+                                icon: document.documentType.icon,
+                                description: document.urls.length > 0 ? document.urls[0].url : null,
+                                url: document.urls.length > 0 ? document.urls[0].url : null,
+                                published: document.variants[0].state === "Published"
+                            };
+                        }
+                        return item;
+                    });
+                    if (element.udi != null) {
+                        processedUdis.add(element.udi);
+                    }
+                }
+            }
+        }
+
+        this.value = newValue;
+    }
+
+    async firstUpdated() {
+
+        if (this._value != undefined && this._value.length > 0) {
+            await this.#getMenuItemInfo(this._value);
+            this.requestUpdate();
+        }
+
         this.style.setProperty('interpolate-size', 'allow-keywords');
     }
 

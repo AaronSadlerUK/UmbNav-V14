@@ -1,5 +1,5 @@
 export type UmbNavLinkPickerLinkType = 'document' | 'external' | 'media' | 'title';
-export type ModelEntryType = {
+export type UmbNavType = {
     key: string | null | undefined;
     name: string | null | undefined;
     description?: string | null | undefined,
@@ -8,9 +8,10 @@ export type ModelEntryType = {
     itemType: UmbNavLinkPickerLinkType | null | undefined,
     udi: string | null | undefined,
     anchor: string | null | undefined,
+    published?: boolean | null | undefined,
     naviHide?: boolean | null | undefined,
     culture?: string | null | undefined,
-    children: ModelEntryType[];
+    children: UmbNavType[];
     expanded?: boolean;
     target?: string | null | undefined
 };

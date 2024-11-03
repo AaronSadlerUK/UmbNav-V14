@@ -8,14 +8,14 @@ import {
 import {UmbElementMixin} from "@umbraco-cms/backoffice/element-api";
 import './umbnav-group.js';
 import type {UmbNavGroup} from './umbnav-group.js';
-import {ModelEntryType} from "./umbnav.token.ts";
+import {UmbNavType} from "./umbnav.token.ts";
 
 @customElement('umbnav-property-editor-ui')
 export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElement) implements UmbPropertyEditorUiElement {
     @property()
-    value: ModelEntryType[] = [];
+    value: UmbNavType[] = [];
 
-    @property({ attribute: false })
+    @property({attribute: false})
     config: UmbPropertyEditorConfigCollection | undefined;
 
     @state()
@@ -31,9 +31,9 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
     toggleAllNodes() {
         const expand = this.value?.some(item => item.expanded);
 
-        const toggleRecursive = (items: ModelEntryType[] = []): ModelEntryType[] => {
+        const toggleRecursive = (items: UmbNavType[] = []): UmbNavType[] => {
             return items.map(item => {
-                const newItem = { ...item, expanded: !expand };
+                const newItem = {...item, expanded: !expand};
                 if (newItem.children && newItem.children.length > 0) {
                     newItem.children = toggleRecursive(newItem.children);
                 }
