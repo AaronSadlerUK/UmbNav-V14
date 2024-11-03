@@ -219,7 +219,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 if (media != null) {
                     menuItem = {
                         ...menuItem,
-                        name: media.variants[0].name,
+                        name: menuItem.name ? menuItem.name : media.variants[0].name,
                         icon: media.mediaType.icon,
                         url: media.values.length > 0 ? (media.values[0].value as { src: string }).src : null,
                     };
@@ -232,7 +232,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 if (document != null) {
                     menuItem = {
                         ...menuItem,
-                        name: document.variants[0].name,
+                        name: menuItem.name ? menuItem.name : document.variants[0].name,
                         icon: document.documentType.icon,
                         url: document.urls.length > 0 ? document.urls[0].url : null,
                         published: document.variants[0].state === "Published"
