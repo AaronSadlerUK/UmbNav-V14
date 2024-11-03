@@ -35,8 +35,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             const oldValue = this._value;
             this._value = model;
             this.requestUpdate('value', oldValue);
-            // Fire an event for the parent to know that the model has changed.
-            this.dispatchEvent(new CustomEvent('change'));
+            this.#dispatchChangeEvent();
         },
     });
 
@@ -89,9 +88,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         };
 
         this.value = removeItemRecursive(this.value, key);
-
         this.#dispatchChangeEvent();
-        this.requestUpdate();
     };
 
     toggleNode(event: CustomEvent<{ expanded: boolean; key: string }>) {
@@ -170,8 +167,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             menuItem.key = uuidv4().replace(/-/g, '');
             this.addItem(menuItem);
         }
-
-        this.#dispatchChangeEvent();
     }
 
     async toggleLinkPicker(key: string | null | undefined, siblingKey?: string | null | undefined) {
@@ -254,8 +249,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             } else {
                 this.addItem(this.convertToUmbNavLink(menuItem, null), siblingKey);
             }
-
-            this.#dispatchChangeEvent();
         } catch (error) {
             console.error(error);
         }
@@ -276,7 +269,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         }
 
         this.value = newValue;
-        this.requestUpdate(); // Notify LitElement to re-render
+        this.#dispatchChangeEvent();
     }
 
     updateItem(updatedItem: ModelEntryType): void {
@@ -293,7 +286,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         };
 
         this.value = updateItemRecursive(this.value, updatedItem.key!);
-        this.requestUpdate(); // Notify LitElement to re-render
+        this.#dispatchChangeEvent();
     }
 
     findItemByKey(key: string, items: ModelEntryType[]): ModelEntryType | undefined {
