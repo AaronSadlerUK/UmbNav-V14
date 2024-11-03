@@ -161,7 +161,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             ...data,
         };
 
-        if (this.value.find(item => item.key === key)) {
+        if (this.value && this.value?.find(item => item.key === key)) {
             this.updateItem(menuItem);
         } else {
             menuItem.key = uuidv4().replace(/-/g, '');
