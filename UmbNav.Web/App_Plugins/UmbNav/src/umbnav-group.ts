@@ -1,5 +1,5 @@
 import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
-import {css, customElement, html, LitElement, property, repeat} from '@umbraco-cms/backoffice/external/lit';
+import {css, customElement, html, LitElement, property, repeat, state} from '@umbraco-cms/backoffice/external/lit';
 import {UmbElementMixin} from '@umbraco-cms/backoffice/element-api';
 import {UmbSorterController} from '@umbraco-cms/backoffice/sorter';
 import {UMB_LINK_PICKER_MODAL, UmbLinkPickerLink,} from '@umbraco-cms/backoffice/multi-url-picker';
@@ -69,7 +69,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         return this._value ?? [];
     }
 
-    @property({type: Boolean, attribute: false})
+    @state()
     public get enableTextItems(): Boolean {
         return <Boolean>this.config.find(item => item.alias === 'enableTextItems')?.value ?? false;
     }
