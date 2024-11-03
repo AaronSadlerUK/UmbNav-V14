@@ -12,7 +12,7 @@ import type {UmbNavGroup, ModelEntryType} from './umbnav-group.js';
 @customElement('umbnav-property-editor-ui')
 export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElement) implements UmbPropertyEditorUiElement {
     @property()
-    value: ModelEntryType[] | undefined;
+    value: ModelEntryType[] = [];
 
     @property({ attribute: false })
     config: UmbPropertyEditorConfigCollection | undefined;
@@ -54,7 +54,7 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
                 ` : ''}
                 <umbnav-group
                         .config=${this.config}
-                        .value=${this.value}
+                        .value=${this.value === undefined ? [] : this.value}
                         @change=${this.onChange}></umbnav-group>
             </div>
         `;
