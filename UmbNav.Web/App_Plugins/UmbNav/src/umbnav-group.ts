@@ -6,7 +6,7 @@ import {UMB_LINK_PICKER_MODAL, UmbLinkPickerLink,} from '@umbraco-cms/backoffice
 import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
 import {UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext,} from '@umbraco-cms/backoffice/modal';
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import {
     UmbPropertyValueChangeEvent,
     UmbPropertyEditorConfigProperty
@@ -39,7 +39,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         },
     });
 
-    @property({ type: Array })
+    @property({type: Array})
     config: Array<UmbPropertyEditorConfigProperty> = [];
 
     @property({type: Boolean, reflect: true})
@@ -81,7 +81,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                     return false;
                 }
                 if (item.children) {
-                    item = { ...item, children: removeItemRecursive(item.children, key) };
+                    item = {...item, children: removeItemRecursive(item.children, key)};
                 }
                 return true;
             });
@@ -346,7 +346,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     async #getDocument(entityKey: string | undefined | null) {
         if (!entityKey) return;
         // Should this be done here or in the action file?
-        const data  = await DocumentService.getDocumentById({ id: entityKey });
+        const data = await DocumentService.getDocumentById({id: entityKey});
         if (!data) return;
         //TODO How do we ensure we get the correct variant?
         return data;
@@ -356,7 +356,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     async #getMedia(entityKey: string | undefined | null) {
         if (!entityKey) return;
         // Should this be done here or in the action file?
-        const data  = await MediaService.getMediaById({ id: entityKey });
+        const data = await MediaService.getMediaById({id: entityKey});
         if (!data) return;
         //TODO How do we ensure we get the correct variant?
         return data;
@@ -390,7 +390,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                                 class="${item.expanded ? 'expanded' : 'collapsed'}"
                                                 .config=${this.config}
                                                 @change=${(e: Event) => {
-                                                    item = { ...item, children: (e.target as UmbNavGroup).value };
+                                                    item = {...item, children: (e.target as UmbNavGroup).value};
                                                 }}></umbnav-group>
                                     </umbnav-item>
                                 `,
@@ -398,8 +398,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
                 <uui-button-group>
                     ${this.enableTextItems ? html`
-                    <uui-button label="Add Text Item" look="placeholder" class="add-menuitem-button"
-                                @click=${() => this.toggleTextModal(null)}></uui-button>
+                        <uui-button label="Add Text Item" look="placeholder" class="add-menuitem-button"
+                                    @click=${() => this.toggleTextModal(null)}></uui-button>
                     ` : ''}
                     <uui-button label="Add Link Item" look="placeholder" class="add-menuitem-button"
                                 @click=${() => this.newNode()}></uui-button>
@@ -414,6 +414,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             :root {
                 interpolate-size: allow-keywords;
             }
+
             :host {
                 display: flex;
                 flex-direction: column;
@@ -427,6 +428,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             }
 
             //*********** */
+
             umbnav-group {
                 outline: 1px solid red;
             }
