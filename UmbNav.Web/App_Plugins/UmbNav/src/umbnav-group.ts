@@ -81,7 +81,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                     return false;
                 }
                 if (item.children) {
-                    item.children = removeItemRecursive(item.children, key);
+                    item = { ...item, children: removeItemRecursive(item.children, key) };
                 }
                 return true;
             });
@@ -387,10 +387,9 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                         <umbnav-group
                                                 ?nested=${true}
                                                 class="${item.expanded ? 'expanded' : 'collapsed'}"
-                                                .value=${item.children ?? []}
                                                 .config=${this.config}
                                                 @change=${(e: Event) => {
-                                                    item.children = (e.target as UmbNavGroup).value;
+                                                    item = { ...item, children: (e.target as UmbNavGroup).value };
                                                 }}></umbnav-group>
                                     </umbnav-item>
                                 `,
