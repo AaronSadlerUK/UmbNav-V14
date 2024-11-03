@@ -70,6 +70,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         });
     }
 
+    @state()
     private _value?: ModelEntryType[];
 
     removeItem = (event: CustomEvent<{ key: string }>) => {
