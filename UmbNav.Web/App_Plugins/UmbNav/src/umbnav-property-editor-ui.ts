@@ -1,5 +1,5 @@
 import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
-import {css, html, customElement, LitElement, property} from '@umbraco-cms/backoffice/external/lit';
+import {css, html, customElement, LitElement, property, state} from '@umbraco-cms/backoffice/external/lit';
 import {
     UmbPropertyEditorConfigCollection,
     UmbPropertyEditorUiElement,
@@ -17,7 +17,7 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
     @property({ attribute: false })
     config: UmbPropertyEditorConfigCollection | undefined;
 
-    @property({type: Boolean, attribute: false})
+    @state()
     public get enableToggleAllButton(): Boolean {
         return <Boolean>this.config?.find(item => item.alias === 'enableToggleAllButton')?.value ?? false;
     }
