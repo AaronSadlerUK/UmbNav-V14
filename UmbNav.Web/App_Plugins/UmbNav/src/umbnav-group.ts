@@ -163,7 +163,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             item = this.findItemByKey(key, this.value) as ModelEntryType;
         }
 
-        const customContext = this.#modalContext?.open(this, UMBNAV_TEXT_ITEM_MODAL, {
+        const modalHandler = this.#modalContext?.open(this, UMBNAV_TEXT_ITEM_MODAL, {
             data: {
                 key: key,
                 headline: 'Add text item',
@@ -171,8 +171,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             }
         });
 
-        const data = await customContext?.onSubmit();
-
+        const data = await modalHandler?.onSubmit().catch(() => undefined);
+        if (!modalHandler) return;
         if (!data) return;
 
         // @ts-ignore
