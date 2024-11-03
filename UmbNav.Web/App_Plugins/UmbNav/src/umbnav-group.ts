@@ -6,7 +6,7 @@ import {UMB_LINK_PICKER_MODAL, UmbLinkPickerLink,} from '@umbraco-cms/backoffice
 import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
 import {UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext,} from '@umbraco-cms/backoffice/modal';
-import {Guid} from "guid-typescript";
+import { v4 as uuidv4 } from 'uuid';
 import {
     UmbPropertyValueChangeEvent,
     UmbPropertyEditorConfigProperty
@@ -183,7 +183,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         if (this.value.find(item => item.key === key)) {
             this.updateItem(menuItem);
         } else {
-            menuItem.key = Guid.create().toString();
+            menuItem.key = uuidv4().replace(/-/g, '');
             this.addItem(menuItem);
         }
 
@@ -336,7 +336,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
     convertToUmbNavLink(item: UmbLinkPickerLink, key: string | null | undefined): ModelEntryType {
         return {
-            key: key ?? Guid.create().toString(),
+            key: key ?? uuidv4().replace(/-/g, ''),
             name: item.name,
             url: item.url,
             icon: item.icon,
