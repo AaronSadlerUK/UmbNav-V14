@@ -1,12 +1,12 @@
 import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
-import {css, customElement, html, LitElement, property, repeat} from '@umbraco-cms/backoffice/external/lit';
+import {css, customElement, html, LitElement, property, repeat, state} from '@umbraco-cms/backoffice/external/lit';
 import {UmbElementMixin} from '@umbraco-cms/backoffice/element-api';
 import {UmbSorterController} from '@umbraco-cms/backoffice/sorter';
 import {UMB_LINK_PICKER_MODAL, UmbLinkPickerLink,} from '@umbraco-cms/backoffice/multi-url-picker';
 import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
 import {UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext,} from '@umbraco-cms/backoffice/modal';
-import {Guid} from "guid-typescript";
+import { v4 as uuidv4 } from 'uuid';
 import {
     UmbPropertyValueChangeEvent,
     UmbPropertyEditorConfigProperty
@@ -41,10 +41,10 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     // Sorter setup:
     #sorter = new UmbSorterController<ModelEntryType, UmbNavItem>(this, {
         getUniqueOfElement: (element) => {
-            return element.name;
+            return element.key;
         },
         getUniqueOfModel: (modelEntry) => {
-            return modelEntry.name;
+            return modelEntry.key;
         },
         identifier: 'umbnav-identifier',
         itemSelector: 'umbnav-item',
@@ -69,7 +69,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         return this._value ?? [];
     }
 
-    @property({type: Boolean, attribute: false})
+    @state()
     public get enableTextItems(): Boolean {
         return <Boolean>this.config.find(item => item.alias === 'enableTextItems')?.value ?? false;
     }
@@ -106,6 +106,9 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         };
 
         this.value = removeItemRecursive(this.value, key);
+
+        this.#dispatchChangeEvent();
+        this.requestUpdate();
     };
 
     toggleNode(event: CustomEvent<{ expanded: boolean; key: string }>) {
@@ -160,7 +163,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             item = this.findItemByKey(key, this.value) as ModelEntryType;
         }
 
-        const customContext = this.#modalContext?.open(this, UMBNAV_TEXT_ITEM_MODAL, {
+        const modalHandler = this.#modalContext?.open(this, UMBNAV_TEXT_ITEM_MODAL, {
             data: {
                 key: key,
                 headline: 'Add text item',
@@ -168,8 +171,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             }
         });
 
-        const data = await customContext?.onSubmit();
-
+        const data = await modalHandler?.onSubmit().catch(() => undefined);
+        if (!modalHandler) return;
         if (!data) return;
 
         // @ts-ignore
@@ -180,9 +183,11 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         if (this.value.find(item => item.key === key)) {
             this.updateItem(menuItem);
         } else {
-            menuItem.key = Guid.create().toString();
+            menuItem.key = uuidv4().replace(/-/g, '');
             this.addItem(menuItem);
         }
+
+        this.#dispatchChangeEvent();
     }
 
     async toggleLinkPicker(key: string | null | undefined, siblingKey?: string | null | undefined) {
@@ -331,7 +336,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
     convertToUmbNavLink(item: UmbLinkPickerLink, key: string | null | undefined): ModelEntryType {
         return {
-            key: key ?? Guid.create().toString(),
+            key: key ?? uuidv4().replace(/-/g, ''),
             name: item.name,
             url: item.url,
             icon: item.icon,
@@ -399,6 +404,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                                 ?nested=${true}
                                                 class="${item.expanded ? 'expanded' : 'collapsed'}"
                                                 .value=${item.children ?? []}
+                                                .config=${this.config}
                                                 @change=${(e: Event) => {
                                                     item.children = (e.target as UmbNavGroup).value;
                                                 }}></umbnav-group>

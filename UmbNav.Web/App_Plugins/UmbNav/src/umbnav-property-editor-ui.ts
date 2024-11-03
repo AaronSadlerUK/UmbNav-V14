@@ -1,5 +1,5 @@
 import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
-import {css, html, customElement, LitElement, property} from '@umbraco-cms/backoffice/external/lit';
+import {css, html, customElement, LitElement, property, state} from '@umbraco-cms/backoffice/external/lit';
 import {
     UmbPropertyEditorConfigCollection,
     UmbPropertyEditorUiElement,
@@ -12,12 +12,12 @@ import type {UmbNavGroup, ModelEntryType} from './umbnav-group.js';
 @customElement('umbnav-property-editor-ui')
 export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElement) implements UmbPropertyEditorUiElement {
     @property()
-    value: ModelEntryType[] | undefined;
+    value: ModelEntryType[] = [];
 
     @property({ attribute: false })
     config: UmbPropertyEditorConfigCollection | undefined;
 
-    @property({type: Boolean, attribute: false})
+    @state()
     public get enableToggleAllButton(): Boolean {
         return <Boolean>this.config?.find(item => item.alias === 'enableToggleAllButton')?.value ?? false;
     }
@@ -54,7 +54,7 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
                 ` : ''}
                 <umbnav-group
                         .config=${this.config}
-                        .value=${this.value}
+                        .value=${this.value === undefined ? [] : this.value}
                         @change=${this.onChange}></umbnav-group>
             </div>
         `;

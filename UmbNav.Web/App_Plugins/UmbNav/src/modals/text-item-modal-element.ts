@@ -4,6 +4,8 @@ import { UmbNavTextItemModalData } from "./text-item-modal-token.ts";
 import { UUIInputEvent } from "@umbraco-cms/backoffice/external/uui";
 import {ModelEntryType} from "../umbnav-group.ts";
 import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
+import {umbBindToValidation, UmbValidationContext} from "@umbraco-cms/backoffice/validation";
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umbnav-text-item-modal')
 export class UmbNavModalElement extends
@@ -21,17 +23,30 @@ export class UmbNavModalElement extends
     @state()
     name: string = '';
 
+    @state()
+    private _submitButtonState: UUIButtonState;
+
     #handleConfirm() {
-        this.value = {
-            anchor: null,
-            icon: 'icon-tag',
-            itemType: 'title',
-            key: this.data?.key ?? '',
-            published: true,
-            udi: null,
-            url: null,
-            name: this.value?.name ?? ''} ;
-        this.modalContext?.submit();
+        this._submitButtonState = 'waiting';
+
+        this.#validation.validate().then(() => {
+            (this.shadowRoot?.getElementById('label') as HTMLElement)?.classList.remove('invalid');
+            this._submitButtonState = 'success';
+
+            this.value = {
+                anchor: null,
+                icon: 'icon-tag',
+                itemType: 'title',
+                key: this.data?.key ?? '',
+                published: true,
+                udi: null,
+                url: null,
+                name: this.value?.name ?? ''} ;
+            this.modalContext?.submit();
+        }, () => {
+            (this.shadowRoot?.getElementById('label') as HTMLElement)?.classList.add('invalid');
+            this._submitButtonState = 'failed';
+        });
     }
 
     #handleCancel() {
@@ -39,31 +54,47 @@ export class UmbNavModalElement extends
     }
 
     #contentChange(event: UUIInputEvent) {
+        if (event.target.value.toString().length === 0) {
+            (this.shadowRoot?.getElementById('label') as HTMLElement)?.classList.add('invalid');
+        }else{
+            (this.shadowRoot?.getElementById('label') as HTMLElement)?.classList.remove('invalid');
+        }
         this.updateValue({name: event.target.value.toString()});
     }
+
+    #validation = new UmbValidationContext(this);
 
     render() {
         return html`
             <umb-body-layout .headline=${this.data?.headline ?? 'Custom dialog'}>
                 <uui-box>
-                    <uui-label for="umbnav-text-item">Title</uui-label>
+                    <uui-label id="label" for="umbnav-text-item"
+                               required>
+                        Title
+                    </uui-label>
                     <uui-input label="content" 
                                id="umbnav-text-item"
                         rows=10
                         .value=${this.data?.name}
-                        @input=${this.#contentChange}>
+                        @input=${this.#contentChange}
+                               required
+                               ${umbBindToValidation(this)}
+                    >
                     </uui-input>
                 </uui-box>
-
-                <div slot="actions">
-                        <uui-button id="cancel" label="Cancel" @click="${this.#handleCancel}">Cancel</uui-button>
-                        <uui-button
-                            id="submit"
-                            color='positive'
-                            look="primary"
-                            label="Submit"
-                            @click=${this.#handleConfirm}></uui-button>
-            </div>
+                <uui-button
+                        slot="actions"
+                        @click=${this.#handleCancel}
+                        look="default"
+                        color="default"
+                        label=${this.localize.term('general_close')}></uui-button>
+                <uui-button
+                        slot="actions"
+                        @click=${this.#handleConfirm}
+                        color="positive"
+                        look="primary"
+                        .state=${this._submitButtonState}
+                        label=${this.localize.term('general_submit')}></uui-button>
             </umb-body-layout>
         `;
     }
@@ -71,6 +102,9 @@ export class UmbNavModalElement extends
     static override styles = [
         UmbTextStyles,
         css`
+            .invalid {
+                color: var(--uui-color-danger);
+            }
             uui-input, uui-label {
                 margin-bottom: var(--uui-size-space-6);
             }
