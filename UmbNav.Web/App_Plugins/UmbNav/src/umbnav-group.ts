@@ -139,6 +139,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             url: null,
             anchor: null,
             description: null,
+            children: []
         }
 
         if (key != null) {
@@ -328,6 +329,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             udi: item.unique != null && item.unique.length > 0 ? item.unique : null,
             anchor: item.queryString,
             description: item.url,
+            children: []
         };
     }
 
