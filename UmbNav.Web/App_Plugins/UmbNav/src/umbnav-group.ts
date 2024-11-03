@@ -41,10 +41,10 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     // Sorter setup:
     #sorter = new UmbSorterController<ModelEntryType, UmbNavItem>(this, {
         getUniqueOfElement: (element) => {
-            return element.name;
+            return element.key;
         },
         getUniqueOfModel: (modelEntry) => {
-            return modelEntry.name;
+            return modelEntry.key;
         },
         identifier: 'umbnav-identifier',
         itemSelector: 'umbnav-item',
