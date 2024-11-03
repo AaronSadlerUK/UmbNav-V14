@@ -2,10 +2,10 @@ import {css, customElement, html, state} from '@umbraco-cms/backoffice/external/
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbNavTextItemModalData } from "./text-item-modal-token.ts";
 import { UUIInputEvent } from "@umbraco-cms/backoffice/external/uui";
-import {ModelEntryType} from "../umbnav-group.ts";
 import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
 import {umbBindToValidation, UmbValidationContext} from "@umbraco-cms/backoffice/validation";
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import {ModelEntryType} from "../umbnav.token.ts";
 
 @customElement('umbnav-text-item-modal')
 export class UmbNavModalElement extends
@@ -34,14 +34,15 @@ export class UmbNavModalElement extends
             this._submitButtonState = 'success';
 
             this.value = {
-                anchor: null,
+                key: this.data?.key ?? '',
+                name: this.value?.name ?? '',
+                url: null,
                 icon: 'icon-tag',
                 itemType: 'title',
-                key: this.data?.key ?? '',
-                published: true,
                 udi: null,
-                url: null,
-                name: this.value?.name ?? ''} ;
+                anchor: null,
+                published: true,
+                children: []};
             this.modalContext?.submit();
         }, () => {
             (this.shadowRoot?.getElementById('label') as HTMLElement)?.classList.add('invalid');

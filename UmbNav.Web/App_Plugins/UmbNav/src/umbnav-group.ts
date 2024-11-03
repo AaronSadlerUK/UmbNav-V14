@@ -13,25 +13,7 @@ import {
 } from "@umbraco-cms/backoffice/property-editor";
 import {DocumentService, MediaService} from '@umbraco-cms/backoffice/external/backend-api';
 import {UMBNAV_TEXT_ITEM_MODAL} from "./modals/text-item-modal-token.ts";
-import {UmbNavLinkPickerLinkType} from "./umbnav.token.ts";
-
-export type ModelEntryType = {
-    key: string | null | undefined;
-    name: string | null | undefined;
-    description?: string | null | undefined,
-    url: string | null | undefined,
-    icon: string | null | undefined,
-    itemType: UmbNavLinkPickerLinkType | null | undefined,
-    udi: string | null | undefined,
-    anchor: string | null | undefined,
-    published: boolean | null | undefined,
-    naviHide?: boolean | null | undefined,
-    culture?: string | null | undefined,
-    id?: number | null | undefined,
-    children?: ModelEntryType[];
-    expanded?: boolean;
-    target?: string | null | undefined
-};
+import {ModelEntryType} from "./umbnav.token.ts";
 
 @customElement('umbnav-group')
 export class UmbNavGroup extends UmbElementMixin(LitElement) {
@@ -53,8 +35,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             const oldValue = this._value;
             this._value = model;
             this.requestUpdate('value', oldValue);
-            // Fire an event for the parent to know that the model has changed.
-            this.dispatchEvent(new CustomEvent('change'));
+            this.#dispatchChangeEvent();
         },
     });
 
@@ -88,6 +69,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         });
     }
 
+    @state()
     private _value?: ModelEntryType[];
 
     removeItem = (event: CustomEvent<{ key: string }>) => {
@@ -99,16 +81,14 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                     return false;
                 }
                 if (item.children) {
-                    item.children = removeItemRecursive(item.children, key);
+                    item = { ...item, children: removeItemRecursive(item.children, key) };
                 }
                 return true;
             });
         };
 
         this.value = removeItemRecursive(this.value, key);
-
         this.#dispatchChangeEvent();
-        this.requestUpdate();
     };
 
     toggleNode(event: CustomEvent<{ expanded: boolean; key: string }>) {
@@ -157,6 +137,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             url: null,
             anchor: null,
             description: null,
+            children: []
         }
 
         if (key != null) {
@@ -186,8 +167,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             menuItem.key = uuidv4().replace(/-/g, '');
             this.addItem(menuItem);
         }
-
-        this.#dispatchChangeEvent();
     }
 
     async toggleLinkPicker(key: string | null | undefined, siblingKey?: string | null | undefined) {
@@ -237,7 +216,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 if (media != null) {
                     menuItem = {
                         ...menuItem,
-                        name: media.variants[0].name,
+                        name: menuItem.name ? menuItem.name : media.variants[0].name,
                         icon: media.mediaType.icon,
                         url: media.values.length > 0 ? (media.values[0].value as { src: string }).src : null,
                     };
@@ -250,7 +229,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 if (document != null) {
                     menuItem = {
                         ...menuItem,
-                        name: document.variants[0].name,
+                        name: menuItem.name ? menuItem.name : document.variants[0].name,
                         icon: document.documentType.icon,
                         url: document.urls.length > 0 ? document.urls[0].url : null,
                         published: document.variants[0].state === "Published"
@@ -258,13 +237,18 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                 }
             }
 
+            if (result.link.type === null) {
+                menuItem = {
+                    ...menuItem,
+                    icon: "icon-unlink"
+                };
+            }
+
             if (this.value.find(item => item.key === key)) {
                 this.updateItem(this.convertToUmbNavLink(menuItem, key));
             } else {
                 this.addItem(this.convertToUmbNavLink(menuItem, null), siblingKey);
             }
-
-            this.#dispatchChangeEvent();
         } catch (error) {
             console.error(error);
         }
@@ -285,7 +269,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         }
 
         this.value = newValue;
-        this.requestUpdate(); // Notify LitElement to re-render
+        this.#dispatchChangeEvent();
     }
 
     updateItem(updatedItem: ModelEntryType): void {
@@ -302,7 +286,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         };
 
         this.value = updateItemRecursive(this.value, updatedItem.key!);
-        this.requestUpdate(); // Notify LitElement to re-render
+        this.#dispatchChangeEvent();
     }
 
     findItemByKey(key: string, items: ModelEntryType[]): ModelEntryType | undefined {
@@ -346,6 +330,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             udi: item.unique != null && item.unique.length > 0 ? item.unique : null,
             anchor: item.queryString,
             description: item.url,
+            children: []
         };
     }
 
@@ -403,10 +388,9 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                         <umbnav-group
                                                 ?nested=${true}
                                                 class="${item.expanded ? 'expanded' : 'collapsed'}"
-                                                .value=${item.children ?? []}
                                                 .config=${this.config}
                                                 @change=${(e: Event) => {
-                                                    item.children = (e.target as UmbNavGroup).value;
+                                                    item = { ...item, children: (e.target as UmbNavGroup).value };
                                                 }}></umbnav-group>
                                     </umbnav-item>
                                 `,
