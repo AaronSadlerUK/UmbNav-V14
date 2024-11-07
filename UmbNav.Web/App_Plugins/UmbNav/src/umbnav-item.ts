@@ -2,6 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import {ModelEntryType} from "./umbnav.token.ts";
 
 @customElement('umbnav-item')
 export class UmbNavItem extends UmbElementMixin(LitElement) {
@@ -22,12 +23,10 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     @property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
     umbDragPlaceholder = false;
 
-    toggleNode(isExpanded: boolean): void {
-        const event = new CustomEvent<{ expanded: boolean; key: string }>('toggle-children-event', {
-            detail: { expanded: !isExpanded, key: this.key },
+    toggleNode(item: ModelEntryType): void {
+        const event = new CustomEvent<{ item: ModelEntryType }>('toggle-children-event', {
+            detail: { item },
         });
-
-        this.expanded = !isExpanded;
 
         this.dispatchEvent(event);
     }
