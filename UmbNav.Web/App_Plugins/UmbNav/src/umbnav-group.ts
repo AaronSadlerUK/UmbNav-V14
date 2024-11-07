@@ -6,7 +6,7 @@ import {UMB_LINK_PICKER_MODAL, UmbLinkPickerLink,} from '@umbraco-cms/backoffice
 import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
 import {UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext,} from '@umbraco-cms/backoffice/modal';
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import {
     UmbPropertyValueChangeEvent,
     UmbPropertyEditorConfigProperty
@@ -39,11 +39,20 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         },
     });
 
-    @property({ type: Array })
+    @state()
+    private _value?: ModelEntryType[];
+
+    @state()
+    private expandedItems: string[] = [];
+
+    @property({type: Array})
     config: Array<UmbPropertyEditorConfigProperty> = [];
 
     @property({type: Boolean, reflect: true})
     nested: boolean = false;
+
+    @property({type: Boolean, reflect: true})
+    expandAll: boolean = false;
 
     @property({type: Array, attribute: false})
     public get value(): ModelEntryType[] {
@@ -69,9 +78,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         });
     }
 
-    @state()
-    private _value?: ModelEntryType[];
-
     removeItem = (event: CustomEvent<{ key: string }>) => {
         const {key} = event.detail;
 
@@ -81,7 +87,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                     return false;
                 }
                 if (item.children) {
-                    item = { ...item, children: removeItemRecursive(item.children, key) };
+                    item = {...item, children: removeItemRecursive(item.children, key)};
                 }
                 return true;
             });
@@ -91,10 +97,10 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         this.#dispatchChangeEvent();
     };
 
-    toggleNode(event: CustomEvent<{ expanded: boolean; key: string }>) {
-        const {expanded, key} = event.detail;
-        this.value = this.updateExpandedInNested(this.value, key, expanded);
-    }
+    // toggleNode(event: CustomEvent<{ expanded: boolean; key: string }>) {
+    //     const {expanded, key} = event.detail;
+    //     this.value = this.updateExpandedInNested(this.value, key, expanded);
+    // }
 
     updateExpandedInNested(arr: ModelEntryType[], key: string, expanded: boolean) {
         return arr.map(item => {
@@ -273,19 +279,20 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     }
 
     updateItem(updatedItem: ModelEntryType): void {
-        const updateItemRecursive = (list: ModelEntryType[], key: string): ModelEntryType[] => {
-            return list.map(item => {
-                if (item.key === key) {
-                    return {...item, ...updatedItem};
-                }
-                if (item.children) {
-                    item.children = updateItemRecursive(item.children, key);
-                }
-                return item;
-            });
-        };
 
-        this.value = updateItemRecursive(this.value, updatedItem.key!);
+        let updatedValue = [...this.value]
+        console.log('old value', this.value)
+        console.log('updated item', updatedItem)
+
+        const index = updatedValue.findIndex(item => item.key === updatedItem.key);
+        if (index !== -1) {
+            updatedValue[index] = updatedItem;
+        }
+
+        console.log('updated value', updatedValue)
+
+        this.value = updatedValue;
+
         this.#dispatchChangeEvent();
     }
 
@@ -346,7 +353,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     async #getDocument(entityKey: string | undefined | null) {
         if (!entityKey) return;
         // Should this be done here or in the action file?
-        const data  = await DocumentService.getDocumentById({ id: entityKey });
+        const data = await DocumentService.getDocumentById({id: entityKey});
         if (!data) return;
         //TODO How do we ensure we get the correct variant?
         return data;
@@ -356,7 +363,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     async #getMedia(entityKey: string | undefined | null) {
         if (!entityKey) return;
         // Should this be done here or in the action file?
-        const data  = await MediaService.getMediaById({ id: entityKey });
+        const data = await MediaService.getMediaById({id: entityKey});
         if (!data) return;
         //TODO How do we ensure we get the correct variant?
         return data;
@@ -365,6 +372,17 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
     firstUpdated() {
         this.style.setProperty('interpolate-size', 'allow-keywords');
+    }
+
+    toggleNode(event: CustomEvent<{ key: string }>): void {
+        if (!this.expandedItems.includes(event.detail.key)) {
+            this.expandedItems.push(event.detail.key);
+        } else {
+            this.expandedItems = this.expandedItems.filter(key => key !== event.detail.key);
+        }
+
+        console.log('expandedItems', this.expandedItems);
+        this.requestUpdate();
     }
 
     override render() {
@@ -376,10 +394,12 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                         (item) => item.key,
                         (item) =>
                                 html`
+                                    ${console.log('expanded ' +item.name, item.expanded)}
                                     <uui-button-inline-create
                                             @click=${() => this.newNode(item.key)}></uui-button-inline-create>
                                     <umbnav-item name=${item.name} key=${item.key} class=""
                                                  description="${item.description}"
+                                                 .expanded=${ this.expandAll || item.key != null && this.expandedItems.includes(item.key)}
                                                  icon="${item.icon}"
                                                  ?unpublished=${!item.published && item.itemType === "document"}
                                                  @toggle-children-event=${this.toggleNode}
@@ -387,10 +407,12 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                                  @remove-node-event=${this.removeItem}>
                                         <umbnav-group
                                                 ?nested=${true}
-                                                class="${item.expanded ? 'expanded' : 'collapsed'}"
+                                                class="${this.expandAll || item.key != null && this.expandedItems.includes(item.key) ? 'expanded' : 'collapsed'}"
                                                 .config=${this.config}
+                                                .value=${item.children}
                                                 @change=${(e: Event) => {
-                                                    item = { ...item, children: (e.target as UmbNavGroup).value };
+                                                    item = {...item, children: (e.target as UmbNavGroup).value};
+                                                    this.updateItem(item);
                                                 }}></umbnav-group>
                                     </umbnav-item>
                                 `,
@@ -398,8 +420,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
 
                 <uui-button-group>
                     ${this.enableTextItems ? html`
-                    <uui-button label="Add Text Item" look="placeholder" class="add-menuitem-button"
-                                @click=${() => this.toggleTextModal(null)}></uui-button>
+                        <uui-button label="Add Text Item" look="placeholder" class="add-menuitem-button"
+                                    @click=${() => this.toggleTextModal(null)}></uui-button>
                     ` : ''}
                     <uui-button label="Add Link Item" look="placeholder" class="add-menuitem-button"
                                 @click=${() => this.newNode()}></uui-button>
@@ -414,6 +436,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             :root {
                 interpolate-size: allow-keywords;
             }
+
             :host {
                 display: flex;
                 flex-direction: column;
@@ -427,6 +450,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             }
 
             //*********** */
+
             umbnav-group {
                 outline: 1px solid red;
             }

@@ -22,12 +22,10 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     @property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
     umbDragPlaceholder = false;
 
-    toggleNode(isExpanded: boolean): void {
-        const event = new CustomEvent<{ expanded: boolean; key: string }>('toggle-children-event', {
-            detail: { expanded: !isExpanded, key: this.key },
+    toggleNode(): void {
+        const event = new CustomEvent<{ key: string }>('toggle-children-event', {
+            detail: { key: this.key },
         });
-
-        this.expanded = !isExpanded;
 
         this.dispatchEvent(event);
     }
@@ -63,7 +61,7 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
             <div class="tree-node ${this.unpublished ? 'unpublished' : ''}">
                 <div id="arrow">
                 <uui-symbol-expand ?open="${this.expanded}"
-                @click=${() => this.toggleNode(this.expanded)}></uui-symbol-expand>
+                @click=${() => this.toggleNode()}></uui-symbol-expand>
                 </div>
 			    <div id="icon">
                     <umb-icon name="${this.icon}"></umb-icon>

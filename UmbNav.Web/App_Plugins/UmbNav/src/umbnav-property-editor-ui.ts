@@ -23,30 +23,24 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
         return <Boolean>this.config?.find(item => item.alias === 'enableToggleAllButton')?.value ?? false;
     }
 
+    @state()
+    expandAll: boolean = false;
+
     private onChange(e: Event) {
+        console.log('trigerred')
         this.value = (e.target as UmbNavGroup).value;
+        console.log('is this correct?', this.value)
         this.dispatchEvent(new UmbPropertyValueChangeEvent());
     }
 
     toggleAllNodes() {
-        const expand = this.value?.some(item => item.expanded);
-
-        const toggleRecursive = (items: ModelEntryType[] = []): ModelEntryType[] => {
-            return items.map(item => {
-                const newItem = { ...item, expanded: !expand };
-                if (newItem.children && newItem.children.length > 0) {
-                    newItem.children = toggleRecursive(newItem.children);
-                }
-                return newItem;
-            });
-        };
-
-        this.value = toggleRecursive(this.value);
+        this.expandAll = !this.expandAll;
         this.requestUpdate();
     }
 
     render() {
         return html`
+            ${console.log(this.value)}
             <div class="outer-wrapper">
                 ${this.enableToggleAllButton ? html`
                     <uui-button label="Toggle All Items" look="secondary"
@@ -54,6 +48,7 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
                     ></uui-button>
                 ` : ''}
                 <umbnav-group
+                        .expandAll=${this.expandAll}
                         .config=${this.config}
                         .value=${this.value === undefined ? [] : this.value}
                         @change=${this.onChange}></umbnav-group>
