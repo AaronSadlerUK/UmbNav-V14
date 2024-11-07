@@ -9,7 +9,6 @@ import {UmbElementMixin} from "@umbraco-cms/backoffice/element-api";
 import './umbnav-group.js';
 import type {UmbNavGroup} from './umbnav-group.js';
 import {ModelEntryType} from "./umbnav.token.ts";
-import UmbNavItem from "./umbnav-item.ts";
 
 @customElement('umbnav-property-editor-ui')
 export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElement) implements UmbPropertyEditorUiElement {
@@ -24,23 +23,11 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
         return <Boolean>this.config?.find(item => item.alias === 'enableToggleAllButton')?.value ?? false;
     }
 
-    private expandedItems: string[] = [];
-
     private onChange(e: Event) {
         console.log('trigerred')
         this.value = (e.target as UmbNavGroup).value;
         console.log('is this correct?', this.value)
         this.dispatchEvent(new UmbPropertyValueChangeEvent());
-    }
-
-    handleExpandedNodes(e: Event) {
-        const item = (e.target as UmbNavItem);
-
-        if (this.expandedItems.includes(item.key)) {
-            this.expandedItems.push(item.key);
-        } else {
-            this.expandedItems = this.expandedItems.filter(key => key !== item.key);
-        }
     }
 
     toggleAllNodes() {
@@ -72,8 +59,6 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
                 <umbnav-group
                         .config=${this.config}
                         .value=${this.value === undefined ? [] : this.value}
-                        .expandedItems=${this.expandedItems}
-                        @toggle-children-event=${this.handleExpandedNodes}
                         @change=${this.onChange}></umbnav-group>
             </div>
         `;

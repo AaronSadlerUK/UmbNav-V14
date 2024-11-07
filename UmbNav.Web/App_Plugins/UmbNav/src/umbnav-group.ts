@@ -371,12 +371,15 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         this.style.setProperty('interpolate-size', 'allow-keywords');
     }
 
-    toggleNode(item: ModelEntryType): void {
-        const event = new CustomEvent<{ item: ModelEntryType }>('toggle-children-event', {
-            detail: { item },
-        });
+    toggleNode(event: CustomEvent<{ key: string }>): void {
+        if (!this.expandedItems.includes(event.detail.key)) {
+            this.expandedItems.push(event.detail.key);
+        } else {
+            this.expandedItems = this.expandedItems.filter(key => key !== event.detail.key);
+        }
 
-        this.dispatchEvent(event);
+        console.log('expandedItems', this.expandedItems);
+        this.requestUpdate();
     }
 
     override render() {
@@ -393,9 +396,10 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                             @click=${() => this.newNode(item.key)}></uui-button-inline-create>
                                     <umbnav-item name=${item.name} key=${item.key} class=""
                                                  description="${item.description}"
+                                                 .expanded=${item.key != null && this.expandedItems.includes(item.key)}
                                                  icon="${item.icon}"
                                                  ?unpublished=${!item.published && item.itemType === "document"}
-                                                 @toggle-children-event=${this.toggleNode(item)}
+                                                 @toggle-children-event=${this.toggleNode}
                                                  @edit-node-event=${this.toggleLinkPickerEvent}
                                                  @remove-node-event=${this.removeItem}>
                                         <umbnav-group

@@ -2,7 +2,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import {ModelEntryType} from "./umbnav.token.ts";
 
 @customElement('umbnav-item')
 export class UmbNavItem extends UmbElementMixin(LitElement) {
@@ -23,9 +22,9 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     @property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
     umbDragPlaceholder = false;
 
-    toggleNode(item: ModelEntryType): void {
-        const event = new CustomEvent<{ item: ModelEntryType }>('toggle-children-event', {
-            detail: { item },
+    toggleNode(): void {
+        const event = new CustomEvent<{ key: string }>('toggle-children-event', {
+            detail: { key: this.key },
         });
 
         this.dispatchEvent(event);
@@ -62,7 +61,7 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
             <div class="tree-node ${this.unpublished ? 'unpublished' : ''}">
                 <div id="arrow">
                 <uui-symbol-expand ?open="${this.expanded}"
-                @click=${() => this.toggleNode(this.expanded)}></uui-symbol-expand>
+                @click=${() => this.toggleNode()}></uui-symbol-expand>
                 </div>
 			    <div id="icon">
                     <umb-icon name="${this.icon}"></umb-icon>
