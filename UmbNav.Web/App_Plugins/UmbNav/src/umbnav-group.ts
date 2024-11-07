@@ -51,6 +51,9 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     @property({type: Boolean, reflect: true})
     nested: boolean = false;
 
+    @property({type: Boolean, reflect: true})
+    expandAll: boolean = false;
+
     @property({type: Array, attribute: false})
     public get value(): ModelEntryType[] {
         return this._value ?? [];
@@ -396,7 +399,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                             @click=${() => this.newNode(item.key)}></uui-button-inline-create>
                                     <umbnav-item name=${item.name} key=${item.key} class=""
                                                  description="${item.description}"
-                                                 .expanded=${item.key != null && this.expandedItems.includes(item.key)}
+                                                 .expanded=${ this.expandAll || item.key != null && this.expandedItems.includes(item.key)}
                                                  icon="${item.icon}"
                                                  ?unpublished=${!item.published && item.itemType === "document"}
                                                  @toggle-children-event=${this.toggleNode}
@@ -404,7 +407,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                                  @remove-node-event=${this.removeItem}>
                                         <umbnav-group
                                                 ?nested=${true}
-                                                class="${item.key != null && this.expandedItems.includes(item.key) ? 'expanded' : 'collapsed'}"
+                                                class="${this.expandAll || item.key != null && this.expandedItems.includes(item.key) ? 'expanded' : 'collapsed'}"
                                                 .config=${this.config}
                                                 .value=${item.children}
                                                 @change=${(e: Event) => {
