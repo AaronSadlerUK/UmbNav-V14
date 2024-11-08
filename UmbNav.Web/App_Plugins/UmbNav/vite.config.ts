@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
     build: {
         lib: {
-            entry: "src/umbnav-property-editor-ui.ts", // your web component source file
+            entry: "src/index.ts", // your web component source file
             formats: ["es"],
         },
         outDir: "./dist", // all compiled files will be placed here

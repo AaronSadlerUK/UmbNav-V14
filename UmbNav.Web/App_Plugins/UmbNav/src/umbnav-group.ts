@@ -281,15 +281,11 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     updateItem(updatedItem: ModelEntryType): void {
 
         let updatedValue = [...this.value]
-        console.log('old value', this.value)
-        console.log('updated item', updatedItem)
 
         const index = updatedValue.findIndex(item => item.key === updatedItem.key);
         if (index !== -1) {
             updatedValue[index] = updatedItem;
         }
-
-        console.log('updated value', updatedValue)
 
         this.value = updatedValue;
 
@@ -381,7 +377,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             this.expandedItems = this.expandedItems.filter(key => key !== event.detail.key);
         }
 
-        console.log('expandedItems', this.expandedItems);
         this.requestUpdate();
     }
 
@@ -394,7 +389,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                         (item) => item.key,
                         (item) =>
                                 html`
-                                    ${console.log('expanded ' +item.name, item.expanded)}
                                     <uui-button-inline-create
                                             @click=${() => this.newNode(item.key)}></uui-button-inline-create>
                                     <umbnav-item name=${item.name} key=${item.key} class=""
