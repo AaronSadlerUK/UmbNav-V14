@@ -27,9 +27,7 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
     expandAll: boolean = false;
 
     private onChange(e: Event) {
-        console.log('trigerred')
         this.value = (e.target as UmbNavGroup).value;
-        console.log('is this correct?', this.value)
         this.dispatchEvent(new UmbPropertyValueChangeEvent());
     }
 
@@ -40,7 +38,6 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
 
     render() {
         return html`
-            ${console.log(this.value)}
             <div class="outer-wrapper">
                 ${this.enableToggleAllButton ? html`
                     <uui-button label="Toggle All Items" look="secondary"
