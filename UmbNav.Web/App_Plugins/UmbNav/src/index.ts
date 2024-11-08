@@ -1,13 +1,9 @@
-import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 import { manifests as modals } from "./modals/manifest.ts";
 import { manifests as propertyEditors } from "./manifest.ts";
 
-const manifests = [
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+
+export const manifests: Array<ManifestTypes> = [
     ...modals,
     ...propertyEditors
-];
-
-export const onInit: UmbEntryPointOnInit = (_host, extensionRegistry) => {
-    // register the manifests
-    extensionRegistry.registerMany(manifests);
-};
+]

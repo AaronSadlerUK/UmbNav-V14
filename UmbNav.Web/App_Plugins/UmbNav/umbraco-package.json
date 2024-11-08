@@ -4,9 +4,9 @@
     "version": "4.0.0",
     "extensions": [
         {
-            "name": "Umbraco EntryPoint",
-            "alias": "UmbNav.EntryPoint",
-            "type": "backofficeEntryPoint",
+            "name": "UmbNav Bundle",
+            "alias": "UmbNav.Bundle",
+            "type": "bundle",
             "js": "/App_Plugins/UmbNav/dist/client.js"
         }
     ]
