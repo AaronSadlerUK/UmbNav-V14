@@ -16,6 +16,7 @@ export type ModelEntryType = {
     expanded?: boolean;
     target?: string | null | undefined;
     image?: ImageItem[];
+    customClasses?: string | null | undefined;
 };
 
 export type ImageItem = {

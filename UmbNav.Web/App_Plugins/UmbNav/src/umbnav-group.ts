@@ -14,6 +14,9 @@ import {
 } from "@umbraco-cms/backoffice/property-editor";
 import {DocumentService, MediaService} from '@umbraco-cms/backoffice/external/backend-api';
 import {UMBNAV_TEXT_ITEM_MODAL} from "./modals/text-item-modal-token.ts";
+import {
+    UMBNAV_CUSTOMCSSCLASSES_ITEM_MODAL
+} from "./modals/customcssclasses-item-modal-token.ts";
 import {ImageItem, ModelEntryType} from "./umbnav.token.ts";
 
 @customElement('umbnav-group')
@@ -68,6 +71,11 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     @state()
     public get enableMediaPicker(): Boolean {
         return <Boolean>this.config?.find(item => item.alias === 'allowImageIcon')?.value ?? false;
+    }
+
+    @state()
+    public get enableCustomCssClasses(): Boolean {
+        return <Boolean>this.config?.find(item => item.alias === 'allowCustomClasses')?.value ?? false;
     }
 
     public set value(value: ModelEntryType[]) {
@@ -171,6 +179,46 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         } catch (error) {
             console.error(error);
         }
+    }
+
+    toggleCustomCssClassesEvent(event: CustomEvent<{ key: string | null | undefined }>) {
+        this.toggleCssClassesModal(event.detail.key);
+    }
+
+    async toggleCssClassesModal(key: string | null | undefined) {
+        let item: ModelEntryType = {
+            key: key,
+            name: '',
+            itemType: 'title',
+            icon: 'icon-tag',
+            published: true,
+            udi: null,
+            url: null,
+            anchor: null,
+            description: null,
+            children: [],
+            customClasses: ''
+        }
+
+        if (key != null) {
+            item = this.findItemByKey(key, this.value) as ModelEntryType;
+        }
+
+        const modalHandler = this.#modalContext?.open(this, UMBNAV_CUSTOMCSSCLASSES_ITEM_MODAL, {
+            data: {
+                key: key,
+                headline: 'Add CSS Classes',
+                customCssClasses: item.customClasses ?? ''
+            }
+        });
+
+        const data = await modalHandler?.onSubmit().catch(() => undefined);
+        if (!modalHandler) return;
+        if (!data) return;
+
+        item = { ...item, customClasses: data.customCssClasses };
+
+        this.updateItem(item);
     }
 
     toggleLinkPickerEvent(event: CustomEvent<{ key: string | null | undefined }>) {
@@ -451,11 +499,13 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                                  .expanded=${ this.expandAll || item.key != null && this.expandedItems.includes(item.key)}
                                                  .hasImage="${item.image && item.image.length > 0}"
                                                  .enableMediaPicker=${this.enableMediaPicker}
+                                                 .enableCustomCssClasses=${this.enableCustomCssClasses}
                                                  icon="${item.icon}"
                                                  ?unpublished=${!item.published && item.itemType === "document"}
                                                  @toggle-children-event=${this.toggleNode}
                                                  @edit-node-event=${this.toggleLinkPickerEvent}
                                                  @add-image-event=${this.toggleMediaPickerEvent}
+                                                 @add-customcssclasses-event=${this.toggleCustomCssClassesEvent}
                                                  @remove-node-event=${this.removeItem}>
                                         <umbnav-group
                                                 ?nested=${true}

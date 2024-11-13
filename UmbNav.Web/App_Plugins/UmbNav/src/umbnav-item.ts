@@ -21,6 +21,8 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     hasImage: boolean = false;
     @property({ type: Boolean, reflect: true })
     enableMediaPicker: boolean = false;
+    @property({ type: Boolean, reflect: true })
+    enableCustomCssClasses: boolean = false;
 
     // TODO: Does it make any different to have this as a property?
     @property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
@@ -36,6 +38,15 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
 
     addImage(key: string | null | undefined): void {
         const event = new CustomEvent<{ key: string | null | undefined }>('add-image-event', {
+            detail: {
+                key: key
+            },
+        });
+        this.dispatchEvent(event);
+    }
+
+    addCustomCssClasses(key: string | null | undefined): void {
+        const event = new CustomEvent<{ key: string | null | undefined }>('add-customcssclasses-event', {
             detail: {
                 key: key
             },
@@ -99,6 +110,13 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                                     @click=${() => this.addImage(this.key)}>
                             <uui-icon name="picture"></uui-icon>
                         </uui-button>
+                        ` : ''}
+
+                        ${this.enableCustomCssClasses ? html `
+                            <uui-button look="default" label="Custom CSS Classes"
+                                        @click=${() => this.addCustomCssClasses(this.key)}>
+                                <uui-icon name="code"></uui-icon>
+                            </uui-button>
                         ` : ''}
                         
                         <uui-button look="default" label="Edit"
