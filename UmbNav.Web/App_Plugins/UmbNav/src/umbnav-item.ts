@@ -54,6 +54,15 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
         this.dispatchEvent(event);
     }
 
+    toggleVisibility(key: string | null | undefined): void {
+        const event = new CustomEvent<{ key: string | null | undefined }>('add-togglevisibility-event', {
+            detail: {
+                key: key
+            },
+        });
+        this.dispatchEvent(event);
+    }
+
     editNode(key: string | null | undefined): void {
         const event = new CustomEvent<{ key: string | null | undefined }>('edit-node-event', {
             detail: {
@@ -118,6 +127,11 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                                 <uui-icon name="code"></uui-icon>
                             </uui-button>
                         ` : ''}
+
+                        <uui-button look="default" label="Visibility"
+                                    @click=${() => this.toggleVisibility(this.key)}>
+                            <uui-icon name="lock"></uui-icon>
+                        </uui-button>
                         
                         <uui-button look="default" label="Edit"
                                     @click=${() => this.editNode(this.key)}>

@@ -14,4 +14,12 @@ const cssCustomClassesItemModalManifest = {
     elementName: "umbnav-customcssclasses-item-modal"
 };
 
-export const manifests = [textItemModalManifest, cssCustomClassesItemModalManifest];
+const visibilityModalManifest = {
+    type: 'modal',
+    alias: 'umbnav.visibility.item.modal',
+    name: 'UmbNav (Visibility Item Modal)',
+    element: () => import('./visibility-item-modal-element.ts'),
+    elementName: "umbnav-visibility-item-modal"
+};
+
+export const manifests = [textItemModalManifest, cssCustomClassesItemModalManifest, visibilityModalManifest];

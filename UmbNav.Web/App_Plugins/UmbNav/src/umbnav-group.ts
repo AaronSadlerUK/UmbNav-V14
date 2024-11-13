@@ -17,6 +17,7 @@ import {UMBNAV_TEXT_ITEM_MODAL} from "./modals/text-item-modal-token.ts";
 import {
     UMBNAV_CUSTOMCSSCLASSES_ITEM_MODAL
 } from "./modals/customcssclasses-item-modal-token.ts";
+import { UMBNAV_VISIBILITY_ITEM_MODAL } from "./modals/visibility-item-modal-token.ts";
 import {ImageItem, ModelEntryType} from "./umbnav.token.ts";
 
 @customElement('umbnav-group')
@@ -217,6 +218,48 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         if (!data) return;
 
         item = { ...item, customClasses: data.customCssClasses };
+
+        this.updateItem(item);
+    }
+
+    toggleVisibilityEvent(event: CustomEvent<{ key: string | null | undefined }>) {
+        this.toggleVisibilityModal(event.detail.key);
+    }
+
+    async toggleVisibilityModal(key: string | null | undefined) {
+        let item: ModelEntryType = {
+            key: key,
+            name: '',
+            itemType: 'title',
+            icon: 'icon-tag',
+            published: true,
+            udi: null,
+            url: null,
+            anchor: null,
+            description: null,
+            children: [],
+            customClasses: '',
+            hideLoggedIn: false,
+            hideLoggedOut: false
+        }
+
+        if (key != null) {
+            item = this.findItemByKey(key, this.value) as ModelEntryType;
+        }
+
+        const modalHandler = this.#modalContext?.open(this, UMBNAV_VISIBILITY_ITEM_MODAL, {
+            data: {
+                headline: 'Toggle Item Visibility',
+                hideLoggedIn: item.hideLoggedIn ?? false,
+                hideLoggedOut: item.hideLoggedOut ?? false
+            }
+        });
+
+        const data = await modalHandler?.onSubmit().catch(() => undefined);
+        if (!modalHandler) return;
+        if (!data) return;
+
+        item = { ...item, hideLoggedIn: data.hideLoggedIn, hideLoggedOut: data.hideLoggedOut };
 
         this.updateItem(item);
     }
@@ -506,6 +549,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                                  @edit-node-event=${this.toggleLinkPickerEvent}
                                                  @add-image-event=${this.toggleMediaPickerEvent}
                                                  @add-customcssclasses-event=${this.toggleCustomCssClassesEvent}
+                                                 @add-togglevisibility-event=${this.toggleVisibilityEvent}
                                                  @remove-node-event=${this.removeItem}>
                                         <umbnav-group
                                                 ?nested=${true}

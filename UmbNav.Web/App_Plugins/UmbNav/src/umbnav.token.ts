@@ -17,6 +17,8 @@ export type ModelEntryType = {
     target?: string | null | undefined;
     image?: ImageItem[];
     customClasses?: string | null | undefined;
+    hideLoggedIn?: boolean | null | undefined;
+    hideLoggedOut?: boolean | null | undefined;
 };
 
 export type ImageItem = {
