@@ -2,7 +2,8 @@ import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
 import {css, customElement, html, LitElement, property, repeat, state} from '@umbraco-cms/backoffice/external/lit';
 import {UmbElementMixin} from '@umbraco-cms/backoffice/element-api';
 import {UmbSorterController} from '@umbraco-cms/backoffice/sorter';
-import {UMB_LINK_PICKER_MODAL, UmbLinkPickerLink,} from '@umbraco-cms/backoffice/multi-url-picker';
+import {UMB_LINK_PICKER_MODAL, UmbLinkPickerLink} from '@umbraco-cms/backoffice/multi-url-picker';
+import { UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
 import {UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext,} from '@umbraco-cms/backoffice/modal';
@@ -13,7 +14,7 @@ import {
 } from "@umbraco-cms/backoffice/property-editor";
 import {DocumentService, MediaService} from '@umbraco-cms/backoffice/external/backend-api';
 import {UMBNAV_TEXT_ITEM_MODAL} from "./modals/text-item-modal-token.ts";
-import {ModelEntryType} from "./umbnav.token.ts";
+import {ImageItem, ModelEntryType} from "./umbnav.token.ts";
 
 @customElement('umbnav-group')
 export class UmbNavGroup extends UmbElementMixin(LitElement) {
@@ -62,6 +63,11 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     @state()
     public get enableTextItems(): Boolean {
         return <Boolean>this.config.find(item => item.alias === 'enableTextItems')?.value ?? false;
+    }
+
+    @state()
+    public get enableMediaPicker(): Boolean {
+        return <Boolean>this.config?.find(item => item.alias === 'allowImageIcon')?.value ?? false;
     }
 
     public set value(value: ModelEntryType[]) {
@@ -122,6 +128,49 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             // Return the original item if no changes were made
             return item;
         });
+    }
+
+    toggleMediaPickerEvent(event: CustomEvent<{ key: string | null | undefined }>) {
+        this.toggleMediaPicker(event.detail.key);
+    }
+
+    async toggleMediaPicker(key: string | null | undefined) {
+
+        try {
+
+            if (!key) return
+
+            const umbNavItem = this.findItemByKey(key, this.value);
+
+            if (!umbNavItem) return;
+
+            const selectedUdis = umbNavItem?.image?.map(x => x.udi);
+
+            const modalHandler = this.#modalContext?.open(this, UMB_MEDIA_PICKER_MODAL, {
+                data: {
+                    multiple: false,
+                },
+                value: {
+                    selection: selectedUdis ? selectedUdis : [],
+                },
+            });
+
+            const result = await modalHandler?.onSubmit().catch(() => undefined);
+            if (!modalHandler) return;
+            if (!result) return;
+
+            const convertedImages = result.selection?.map(udi => this.convertToImageType(udi));
+
+            let menuItem = {
+                ...umbNavItem,
+                image: convertedImages
+            };
+
+            this.updateItem(menuItem);
+
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     toggleLinkPickerEvent(event: CustomEvent<{ key: string | null | undefined }>) {
@@ -337,6 +386,12 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         };
     }
 
+    convertToImageType(image: string): ImageItem {
+        return {
+            udi: image
+        };
+    }
+
     #dispatchChangeEvent() {
         this.dispatchEvent(new UmbPropertyValueChangeEvent());
     }
@@ -394,10 +449,13 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                     <umbnav-item name=${item.name} key=${item.key} class=""
                                                  description="${item.description}"
                                                  .expanded=${ this.expandAll || item.key != null && this.expandedItems.includes(item.key)}
+                                                 .hasImage="${item.image && item.image.length > 0}"
+                                                 .enableMediaPicker=${this.enableMediaPicker}
                                                  icon="${item.icon}"
                                                  ?unpublished=${!item.published && item.itemType === "document"}
                                                  @toggle-children-event=${this.toggleNode}
                                                  @edit-node-event=${this.toggleLinkPickerEvent}
+                                                 @add-image-event=${this.toggleMediaPickerEvent}
                                                  @remove-node-event=${this.removeItem}>
                                         <umbnav-group
                                                 ?nested=${true}
