@@ -79,6 +79,11 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         return <Boolean>this.config?.find(item => item.alias === 'allowCustomClasses')?.value ?? false;
     }
 
+    @state()
+    public get enableVisibility(): Boolean {
+        return <Boolean>this.config?.find(item => item.alias === 'allowDisplay')?.value ?? false;
+    }
+
     public set value(value: ModelEntryType[]) {
         const oldValue = this._value;
         this._value = value;
@@ -543,6 +548,9 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                                  .hasImage="${item.image && item.image.length > 0}"
                                                  .enableMediaPicker=${this.enableMediaPicker}
                                                  .enableCustomCssClasses=${this.enableCustomCssClasses}
+                                                 .enableVisibility=${this.enableVisibility}
+                                                 .hideLoggedIn=${item.hideLoggedIn}
+                                                 .hideLoggedOut=${item.hideLoggedOut}
                                                  icon="${item.icon}"
                                                  ?unpublished=${!item.published && item.itemType === "document"}
                                                  @toggle-children-event=${this.toggleNode}

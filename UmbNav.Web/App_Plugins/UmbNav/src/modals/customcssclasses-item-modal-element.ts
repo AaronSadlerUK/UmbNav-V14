@@ -38,11 +38,6 @@ export class UmbNavModalElement extends
     }
 
     #contentChange(event: UUIInputEvent) {
-        if (event.target.value.toString().length === 0) {
-            (this.shadowRoot?.getElementById('label') as HTMLElement)?.classList.add('invalid');
-        }else{
-            (this.shadowRoot?.getElementById('label') as HTMLElement)?.classList.remove('invalid');
-        }
         this.updateValue({customCssClasses: event.target.value.toString()});
     }
 
