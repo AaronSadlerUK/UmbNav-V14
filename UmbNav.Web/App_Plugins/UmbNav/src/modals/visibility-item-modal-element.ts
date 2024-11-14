@@ -16,6 +16,8 @@ export class UmbNavModalElement extends
     connectedCallback(): void {
         super.connectedCallback();
         this.updateValue({hideLoggedIn: this.data?.hideLoggedIn, hideLoggedOut: this.data?.hideLoggedOut});
+        this.hideLoggedIn = this.data?.hideLoggedIn ?? false;
+        this.hideLoggedOut = this.data?.hideLoggedOut ?? false;
     }
 
     @state()
@@ -43,10 +45,12 @@ export class UmbNavModalElement extends
 
     #hideLoggedIn(event: UUIBooleanInputEvent) {
         this.updateValue({hideLoggedIn: event.target.checked});
+        this.hideLoggedIn = event.target.checked;
     }
 
     #hideLoggedOut(event: UUIBooleanInputEvent) {
         this.updateValue({hideLoggedOut: event.target.checked});
+        this.hideLoggedOut = event.target.checked;
     }
 
     render() {

@@ -34,6 +34,12 @@ const umbNavPropertyEditorUiManifest = {
                     "label": "Allow Custom Classes",
                     "description": "Allow the ability to set custom classes on an item.",
                     "propertyEditorUiAlias": "Umb.PropertyEditorUi.Toggle"
+                },
+                {
+                    "alias": "allowDisplay",
+                    "label": "Allow Member Visibility",
+                    "description": "Allow the ability to hide menu items based on member authentication status",
+                    "propertyEditorUiAlias": "Umb.PropertyEditorUi.Toggle"
                 }
             ],
             "defaultData": [
@@ -51,6 +57,10 @@ const umbNavPropertyEditorUiManifest = {
                 },
                 {
                     "alias": "allowCustomClasses",
+                    "value": false
+                },
+                {
+                    "alias": "allowDisplay",
                     "value": false
                 }
             ]

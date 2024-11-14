@@ -23,6 +23,12 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     enableMediaPicker: boolean = false;
     @property({ type: Boolean, reflect: true })
     enableCustomCssClasses: boolean = false;
+    @property({ type: Boolean, reflect: true })
+    hideLoggedIn: boolean = false;
+    @property({ type: Boolean, reflect: true })
+    hideLoggedOut: boolean = false;
+    @property({ type: Boolean, reflect: true })
+    enableVisibility: boolean = false;
 
     // TODO: Does it make any different to have this as a property?
     @property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
@@ -104,7 +110,9 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                         <div id="name">
                             <span class="name" @click=${() => this.editNode(this.key)}>${this.name}</span>
                             
-                            ${this.enableMediaPicker ? html `<span class="image" @click=${() => this.addImage(this.key)}>${this.hasImage ? html `<uui-icon name="picture"></uui-icon>` : ''}</span>` : ''}
+                            ${this.enableMediaPicker ? html `<span class="image" @click=${() => this.addImage(this.key)}>${this.hasImage ? html `<umb-icon name="picture"></umb-icon>` : ''}</span>` : ''}
+                            ${this.enableVisibility && this.hideLoggedOut ? html `<span class="image" @click=${() => this.toggleVisibility(this.key)}>${this.hideLoggedOut ? html `<umb-icon name="lock"></umb-icon>` : ''}</span>` : ''}
+                            ${this.enableVisibility && this.hideLoggedIn ? html `<span class="image" @click=${() => this.toggleVisibility(this.key)}>${this.hideLoggedIn ? html `<umb-icon name="icon-unlocked"></umb-icon>` : ''}</span>` : ''}
                         </div>
                         <div id="description">
                             ${this.description}
@@ -128,10 +136,12 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                             </uui-button>
                         ` : ''}
 
-                        <uui-button look="default" label="Visibility"
-                                    @click=${() => this.toggleVisibility(this.key)}>
-                            <uui-icon name="lock"></uui-icon>
-                        </uui-button>
+                        ${this.enableVisibility ? html `
+                            <uui-button look="default" label="Visibility"
+                                        @click=${() => this.toggleVisibility(this.key)}>
+                                <uui-icon name="lock"></uui-icon>
+                            </uui-button>
+                        ` : ''}
                         
                         <uui-button look="default" label="Edit"
                                     @click=${() => this.editNode(this.key)}>
