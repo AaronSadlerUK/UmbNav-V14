@@ -17,6 +17,12 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     expanded: boolean = false;
     @property({ type: Boolean, reflect: true })
     unpublished: boolean = false;
+    @property({ type: Boolean, reflect: true })
+    hasImage: boolean = false;
+    @property({ type: Boolean, reflect: true })
+    enableMediaPicker: boolean = false;
+    @property({ type: Boolean, reflect: true })
+    enableCustomCssClasses: boolean = false;
 
     // TODO: Does it make any different to have this as a property?
     @property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
@@ -27,6 +33,33 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
             detail: { key: this.key },
         });
 
+        this.dispatchEvent(event);
+    }
+
+    addImage(key: string | null | undefined): void {
+        const event = new CustomEvent<{ key: string | null | undefined }>('add-image-event', {
+            detail: {
+                key: key
+            },
+        });
+        this.dispatchEvent(event);
+    }
+
+    addCustomCssClasses(key: string | null | undefined): void {
+        const event = new CustomEvent<{ key: string | null | undefined }>('add-customcssclasses-event', {
+            detail: {
+                key: key
+            },
+        });
+        this.dispatchEvent(event);
+    }
+
+    toggleVisibility(key: string | null | undefined): void {
+        const event = new CustomEvent<{ key: string | null | undefined }>('add-togglevisibility-event', {
+            detail: {
+                key: key
+            },
+        });
         this.dispatchEvent(event);
     }
 
@@ -68,9 +101,10 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                 </div>
                 <div id="info">
                     <div class="column">
-                        <div id="name" 
-                             @click=${() => this.editNode(this.key)}>
-                            ${this.name}
+                        <div id="name">
+                            <span class="name" @click=${() => this.editNode(this.key)}>${this.name}</span>
+                            
+                            ${this.enableMediaPicker ? html `<span class="image" @click=${() => this.addImage(this.key)}>${this.hasImage ? html `<uui-icon name="picture"></uui-icon>` : ''}</span>` : ''}
                         </div>
                         <div id="description">
                             ${this.description}
@@ -80,6 +114,25 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                 </div>
                 <div id="buttons">
                     <uui-action-bar>
+                        ${this.enableMediaPicker ? html `
+                        <uui-button look="default" label="Image"
+                                    @click=${() => this.addImage(this.key)}>
+                            <uui-icon name="picture"></uui-icon>
+                        </uui-button>
+                        ` : ''}
+
+                        ${this.enableCustomCssClasses ? html `
+                            <uui-button look="default" label="Custom CSS Classes"
+                                        @click=${() => this.addCustomCssClasses(this.key)}>
+                                <uui-icon name="code"></uui-icon>
+                            </uui-button>
+                        ` : ''}
+
+                        <uui-button look="default" label="Visibility"
+                                    @click=${() => this.toggleVisibility(this.key)}>
+                            <uui-icon name="lock"></uui-icon>
+                        </uui-button>
+                        
                         <uui-button look="default" label="Edit"
                                     @click=${() => this.editNode(this.key)}>
                             <uui-icon name="edit"></uui-icon>
@@ -159,10 +212,18 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                 line-height: 1.5em;
             }
 
-            #name:hover {
+            .name:hover {
                 font-weight: 700;
                 text-decoration: underline;
                 color: var(--uui-color-interactive-emphasis, #3544b1);
+            }
+            
+            .image {
+                margin-left: var(--uui-size-space-2);
+            }
+            
+            .image uui-icon {
+                vertical-align: middle;
             }
 
             .tree-node {

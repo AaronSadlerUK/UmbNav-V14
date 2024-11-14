@@ -14,5 +14,13 @@ export type ModelEntryType = {
     id?: number | null | undefined,
     children: ModelEntryType[];
     expanded?: boolean;
-    target?: string | null | undefined
+    target?: string | null | undefined;
+    image?: ImageItem[];
+    customClasses?: string | null | undefined;
+    hideLoggedIn?: boolean | null | undefined;
+    hideLoggedOut?: boolean | null | undefined;
 };
+
+export type ImageItem = {
+    udi: string;
+}

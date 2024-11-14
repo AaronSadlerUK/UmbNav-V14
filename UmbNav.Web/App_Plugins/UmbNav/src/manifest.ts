@@ -22,6 +22,18 @@ const umbNavPropertyEditorUiManifest = {
                     "label": "Enable Toggle All Items Button",
                     "description": "If enabled a button will be displayed to toggle all items.",
                     "propertyEditorUiAlias": "Umb.PropertyEditorUi.Toggle"
+                },
+                {
+                    "alias": "allowImageIcon",
+                    "label": "Allow Image / Icon Url",
+                    "description": "Allow the ability to pick an image for the navigation item.",
+                    "propertyEditorUiAlias": "Umb.PropertyEditorUi.Toggle"
+                },
+                {
+                    "alias": "allowCustomClasses",
+                    "label": "Allow Custom Classes",
+                    "description": "Allow the ability to set custom classes on an item.",
+                    "propertyEditorUiAlias": "Umb.PropertyEditorUi.Toggle"
                 }
             ],
             "defaultData": [
@@ -32,6 +44,14 @@ const umbNavPropertyEditorUiManifest = {
                 {
                     "alias": "enableToggleAllButton",
                     "value": true
+                },
+                {
+                    "alias": "allowImageIcon",
+                    "value": true
+                },
+                {
+                    "alias": "allowCustomClasses",
+                    "value": false
                 }
             ]
         }
