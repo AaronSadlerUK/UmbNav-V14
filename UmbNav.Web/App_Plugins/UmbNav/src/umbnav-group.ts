@@ -8,16 +8,11 @@ import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
 import {UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext,} from '@umbraco-cms/backoffice/modal';
 import {v4 as uuidv4} from 'uuid';
-import {
-    UmbPropertyValueChangeEvent,
-    UmbPropertyEditorConfigProperty
-} from "@umbraco-cms/backoffice/property-editor";
+import {UmbPropertyValueChangeEvent, UmbPropertyEditorConfigProperty} from "@umbraco-cms/backoffice/property-editor";
 import {DocumentService, MediaService} from '@umbraco-cms/backoffice/external/backend-api';
 import {UMBNAV_TEXT_ITEM_MODAL} from "./modals/text-item-modal-token.ts";
-import {
-    UMBNAV_CUSTOMCSSCLASSES_ITEM_MODAL
-} from "./modals/customcssclasses-item-modal-token.ts";
 import { UMBNAV_VISIBILITY_ITEM_MODAL } from "./modals/visibility-item-modal-token.ts";
+import { UMBNAV_SETTINGS_ITEM_MODAL } from "./modals/settings-item-modal-token.ts";
 import {ImageItem, ModelEntryType} from "./umbnav.token.ts";
 
 @customElement('umbnav-group')
@@ -50,6 +45,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     @state()
     private expandedItems: string[] = [];
 
+    private _expandAll: boolean = false;
+
     @property({type: Array})
     config: Array<UmbPropertyEditorConfigProperty> = [];
 
@@ -57,7 +54,23 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     nested: boolean = false;
 
     @property({type: Boolean, reflect: true})
-    expandAll: boolean = false;
+    public get expandAll(): boolean {
+        return this._expandAll;
+    }
+    public set expandAll(value: boolean) {
+        const oldValue = this._expandAll;
+        this._expandAll = value;
+        if (value) {
+            this.expandedItems = [];
+        }
+        this.requestUpdate('expandAll', oldValue);
+        const event = new CustomEvent<{ expandAll: boolean }>('toggle-expandall-event', {
+            detail: {
+                expandAll: this._expandAll
+            },
+        });
+        this.dispatchEvent(event);
+    }
 
     @property({type: Array, attribute: false})
     public get value(): ModelEntryType[] {
@@ -72,11 +85,6 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     @state()
     public get enableMediaPicker(): Boolean {
         return <Boolean>this.config?.find(item => item.alias === 'allowImageIcon')?.value ?? false;
-    }
-
-    @state()
-    public get enableCustomCssClasses(): Boolean {
-        return <Boolean>this.config?.find(item => item.alias === 'allowCustomClasses')?.value ?? false;
     }
 
     @state()
@@ -187,11 +195,11 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         }
     }
 
-    toggleCustomCssClassesEvent(event: CustomEvent<{ key: string | null | undefined }>) {
-        this.toggleCssClassesModal(event.detail.key);
+    toggleSettingsEvent(event: CustomEvent<{ key: string | null | undefined }>) {
+        this.toggleSettingsModal(event.detail.key);
     }
 
-    async toggleCssClassesModal(key: string | null | undefined) {
+    async toggleSettingsModal(key: string | null | undefined) {
         let item: ModelEntryType = {
             key: key,
             name: '',
@@ -210,11 +218,14 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
             item = this.findItemByKey(key, this.value) as ModelEntryType;
         }
 
-        const modalHandler = this.#modalContext?.open(this, UMBNAV_CUSTOMCSSCLASSES_ITEM_MODAL, {
+        const modalHandler = this.#modalContext?.open(this, UMBNAV_SETTINGS_ITEM_MODAL, {
             data: {
                 key: key,
-                headline: 'Add CSS Classes',
-                customCssClasses: item.customClasses ?? ''
+                headline: 'Edit Menu Item',
+                config: this.config,
+                customCssClasses: item.customClasses ?? '',
+                noOpener: item.noopener ?? '',
+                noReferrer: item.noreferrer ?? ''
             }
         });
 
@@ -222,7 +233,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
         if (!modalHandler) return;
         if (!data) return;
 
-        item = { ...item, customClasses: data.customCssClasses };
+        item = { ...item, customClasses: data.customCssClasses, noreferrer: data.noReferrer, noopener: data.noOpener };
 
         this.updateItem(item);
     }
@@ -522,6 +533,10 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     }
 
     toggleNode(event: CustomEvent<{ key: string }>): void {
+        if (this._expandAll) {
+            this.expandAll = false;
+        }
+
         if (!this.expandedItems.includes(event.detail.key)) {
             this.expandedItems.push(event.detail.key);
         } else {
@@ -544,10 +559,9 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                             @click=${() => this.newNode(item.key)}></uui-button-inline-create>
                                     <umbnav-item name=${item.name} key=${item.key} class=""
                                                  description="${item.description}"
-                                                 .expanded=${ this.expandAll || item.key != null && this.expandedItems.includes(item.key)}
+                                                 .expanded=${ this._expandAll || item.key != null && this.expandedItems.includes(item.key)}
                                                  .hasImage="${item.image && item.image.length > 0}"
                                                  .enableMediaPicker=${this.enableMediaPicker}
-                                                 .enableCustomCssClasses=${this.enableCustomCssClasses}
                                                  .enableVisibility=${this.enableVisibility}
                                                  .hideLoggedIn=${item.hideLoggedIn}
                                                  .hideLoggedOut=${item.hideLoggedOut}
@@ -556,7 +570,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                                  @toggle-children-event=${this.toggleNode}
                                                  @edit-node-event=${this.toggleLinkPickerEvent}
                                                  @add-image-event=${this.toggleMediaPickerEvent}
-                                                 @add-customcssclasses-event=${this.toggleCustomCssClassesEvent}
+                                                 @toggle-itemsettings-event=${this.toggleSettingsEvent}
                                                  @add-togglevisibility-event=${this.toggleVisibilityEvent}
                                                  @remove-node-event=${this.removeItem}>
                                         <umbnav-group

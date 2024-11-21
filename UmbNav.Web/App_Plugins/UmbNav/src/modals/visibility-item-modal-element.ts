@@ -57,30 +57,43 @@ export class UmbNavModalElement extends
         return html`
             <umb-body-layout .headline=${this.data?.headline ?? 'Custom dialog'}>
                 <uui-box>
-                    
-                    <uui-toggle label="Hide Logged In"
-                                ?checked="${this.hideLoggedIn}"
-                                @change=${this.#hideLoggedIn}></uui-toggle>
-
-                    <uui-toggle label="Hide Logged Out"
-                                ?checked="${this.hideLoggedOut}"
-                                @change=${this.#hideLoggedOut}></uui-toggle>
+                    ${this.#renderVisibilityToggles()}
                 </uui-box>
-                <uui-button
-                        slot="actions"
-                        @click=${this.#handleCancel}
-                        look="default"
-                        color="default"
-                        label=${this.localize.term('general_close')}></uui-button>
-                <uui-button
-                        slot="actions"
-                        @click=${this.#handleConfirm}
-                        color="positive"
-                        look="primary"
+                <div slot="actions">
+					<uui-button label=${this.localize.term('general_close')} @click=${this.#handleCancel}></uui-button>
+					<uui-button
+						color="positive"
+						look="primary"
+						label=${this.localize.term('general_submit')}
                         .state=${this._submitButtonState}
-                        label=${this.localize.term('general_submit')}></uui-button>
+						@click=${this.#handleConfirm}></uui-button>
+				</div>
             </umb-body-layout>
         `;
+    }
+
+    #renderVisibilityToggles() {
+        return html`
+			<umb-property-layout orientation="vertical">
+				<div class="side-by-side" slot="editor">
+					<umb-property-layout
+						orientation="vertical"
+						label='Toggle Visibility'
+						style="padding:0;"
+                        class="visibility-toggles">
+                        <uui-toggle label="Hide Logged In"
+                                    slot="editor"
+                                    ?checked="${this.hideLoggedIn}"
+                                    @change=${this.#hideLoggedIn}></uui-toggle>
+                        
+                        <uui-toggle label="Hide Logged Out"
+                                    slot="editor"
+                                    ?checked="${this.hideLoggedOut}"
+                                    @change=${this.#hideLoggedOut}></uui-toggle>
+					</umb-property-layout>
+				</div>
+			</umb-property-layout>
+		`;
     }
 
     static override styles = [
@@ -89,12 +102,20 @@ export class UmbNavModalElement extends
             .invalid {
                 color: var(--uui-color-danger);
             }
-            uui-input, uui-label {
-                margin-bottom: var(--uui-size-space-6);
+            uui-box {
+                --uui-box-default-padding: 0 var(--uui-size-space-5);
             }
 
-            uui-input, uui-label {
+            uui-button-group {
                 width: 100%;
+            }
+
+            uui-input {
+                width: 100%;
+            }
+            .visibility-toggles uui-toggle:not(:last-child) {
+                display: block;
+                margin-bottom: var(--uui-size-space-5);
             }
         `,
     ];

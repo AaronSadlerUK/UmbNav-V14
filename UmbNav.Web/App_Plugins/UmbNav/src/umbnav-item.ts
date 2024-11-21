@@ -22,8 +22,6 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
     @property({ type: Boolean, reflect: true })
     enableMediaPicker: boolean = false;
     @property({ type: Boolean, reflect: true })
-    enableCustomCssClasses: boolean = false;
-    @property({ type: Boolean, reflect: true })
     hideLoggedIn: boolean = false;
     @property({ type: Boolean, reflect: true })
     hideLoggedOut: boolean = false;
@@ -51,8 +49,8 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
         this.dispatchEvent(event);
     }
 
-    addCustomCssClasses(key: string | null | undefined): void {
-        const event = new CustomEvent<{ key: string | null | undefined }>('add-customcssclasses-event', {
+    toggleItemSettings(key: string | null | undefined): void {
+        const event = new CustomEvent<{ key: string | null | undefined }>('toggle-itemsettings-event', {
             detail: {
                 key: key
             },
@@ -123,32 +121,30 @@ export class UmbNavItem extends UmbElementMixin(LitElement) {
                 <div id="buttons">
                     <uui-action-bar>
                         ${this.enableMediaPicker ? html `
-                        <uui-button look="default" label="Image"
+                        <uui-button look="secondary" label="Image"
                                     @click=${() => this.addImage(this.key)}>
                             <uui-icon name="picture"></uui-icon>
                         </uui-button>
                         ` : ''}
 
-                        ${this.enableCustomCssClasses ? html `
-                            <uui-button look="default" label="Custom CSS Classes"
-                                        @click=${() => this.addCustomCssClasses(this.key)}>
-                                <uui-icon name="code"></uui-icon>
-                            </uui-button>
-                        ` : ''}
+                        <uui-button look="secondary" label="Item Settings"
+                                    @click=${() => this.toggleItemSettings(this.key)}>
+                            <uui-icon name="icon-settings"></uui-icon>
+                        </uui-button>
 
                         ${this.enableVisibility ? html `
-                            <uui-button look="default" label="Visibility"
+                            <uui-button look="secondary" label="Visibility"
                                         @click=${() => this.toggleVisibility(this.key)}>
                                 <uui-icon name="lock"></uui-icon>
                             </uui-button>
                         ` : ''}
                         
-                        <uui-button look="default" label="Edit"
+                        <uui-button look="secondary" label="Edit"
                                     @click=${() => this.editNode(this.key)}>
                             <uui-icon name="edit"></uui-icon>
                         </uui-button>
 
-                        <uui-button look="default" label="Delete"
+                        <uui-button look="secondary" label="Delete"
                                     @click=${() => this.requestDelete()}>
                             <uui-icon name="delete"></uui-icon>
                         </uui-button>

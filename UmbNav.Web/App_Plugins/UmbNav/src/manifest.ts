@@ -40,6 +40,18 @@ const umbNavPropertyEditorUiManifest = {
                     "label": "Allow Member Visibility",
                     "description": "Allow the ability to hide menu items based on member authentication status",
                     "propertyEditorUiAlias": "Umb.PropertyEditorUi.Toggle"
+                },
+                {
+                    "alias": "hideNoopener",
+                    "label": "Hide noopener Toggle",
+                    "description": "Hide the ability to toggle noopener",
+                    "propertyEditorUiAlias": "Umb.PropertyEditorUi.Toggle"
+                },
+                {
+                    "alias": "hideNoreferrer",
+                    "label": "Hide noreferrer Toggle",
+                    "description": "Hide the ability to toggle noreferrer",
+                    "propertyEditorUiAlias": "Umb.PropertyEditorUi.Toggle"
                 }
             ],
             "defaultData": [
@@ -61,6 +73,14 @@ const umbNavPropertyEditorUiManifest = {
                 },
                 {
                     "alias": "allowDisplay",
+                    "value": false
+                },
+                {
+                    "alias": "hideNoopener",
+                    "value": false
+                },
+                {
+                    "alias": "hideNoreferrer",
                     "value": false
                 }
             ]

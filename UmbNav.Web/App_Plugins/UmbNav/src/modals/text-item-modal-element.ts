@@ -6,6 +6,7 @@ import {UmbTextStyles} from '@umbraco-cms/backoffice/style';
 import {umbBindToValidation, UmbValidationContext} from "@umbraco-cms/backoffice/validation";
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import {ModelEntryType} from "../umbnav.token.ts";
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umbnav-text-item-modal')
 export class UmbNavModalElement extends
@@ -69,19 +70,7 @@ export class UmbNavModalElement extends
         return html`
             <umb-body-layout .headline=${this.data?.headline ?? 'Custom dialog'}>
                 <uui-box>
-                    <uui-label id="label" for="umbnav-text-item"
-                               required>
-                        Title
-                    </uui-label>
-                    <uui-input label="content" 
-                               id="umbnav-text-item"
-                        rows=10
-                        .value=${this.data?.name}
-                        @input=${this.#contentChange}
-                               required
-                               ${umbBindToValidation(this)}
-                    >
-                    </uui-input>
+                    ${this.#renderTextItemInput()}
                 </uui-box>
                 <uui-button
                         slot="actions"
@@ -100,17 +89,46 @@ export class UmbNavModalElement extends
         `;
     }
 
+    #renderTextItemInput() {
+        return html`
+			<umb-property-layout orientation="vertical">
+				<div class="side-by-side" slot="editor">
+					<umb-property-layout
+						orientation="vertical"
+						label="Title"
+						style="padding:0;">
+                        <uui-input label="content"
+                                   slot="editor"
+                                   id="umbnav-text-item"
+                                   rows=10
+                                   .value=${this.data?.name}
+                                   @input=${this.#contentChange}
+                                   required
+                                   ${umbBindToValidation(this)}
+                                   ${umbFocus()}
+                        >
+                        </uui-input>
+					</umb-property-layout>
+				</div>
+			</umb-property-layout>
+		`;
+    }
+
     static override styles = [
         UmbTextStyles,
         css`
             .invalid {
                 color: var(--uui-color-danger);
             }
-            uui-input, uui-label {
-                margin-bottom: var(--uui-size-space-6);
+            uui-box {
+                --uui-box-default-padding: 0 var(--uui-size-space-5);
             }
 
-            uui-input, uui-label {
+            uui-button-group {
+                width: 100%;
+            }
+
+            uui-input {
                 width: 100%;
             }
         `,

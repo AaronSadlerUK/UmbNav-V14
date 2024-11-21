@@ -36,6 +36,10 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
         this.requestUpdate();
     }
 
+    toggleAllNodesEvent(event: CustomEvent<{ expandAll: boolean }>) {
+        this.expandAll = event.detail.expandAll;
+    }
+
     render() {
         return html`
             <div class="outer-wrapper">
@@ -48,6 +52,7 @@ export class UmbNavSorterPropertyEditorUIElement extends UmbElementMixin(LitElem
                         .expandAll=${this.expandAll}
                         .config=${this.config}
                         .value=${this.value === undefined ? [] : this.value}
+                        @toggle-expandall-event=${this.toggleAllNodesEvent}
                         @change=${this.onChange}></umbnav-group>
             </div>
         `;
