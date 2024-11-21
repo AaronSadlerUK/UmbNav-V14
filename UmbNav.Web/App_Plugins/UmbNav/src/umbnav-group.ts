@@ -45,6 +45,8 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     @state()
     private expandedItems: string[] = [];
 
+    private _expandAll: boolean = false;
+
     @property({type: Array})
     config: Array<UmbPropertyEditorConfigProperty> = [];
 
@@ -52,7 +54,23 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     nested: boolean = false;
 
     @property({type: Boolean, reflect: true})
-    expandAll: boolean = false;
+    public get expandAll(): boolean {
+        return this._expandAll;
+    }
+    public set expandAll(value: boolean) {
+        const oldValue = this._expandAll;
+        this._expandAll = value;
+        if (value) {
+            this.expandedItems = [];
+        }
+        this.requestUpdate('expandAll', oldValue);
+        const event = new CustomEvent<{ expandAll: boolean }>('toggle-expandall-event', {
+            detail: {
+                expandAll: this._expandAll
+            },
+        });
+        this.dispatchEvent(event);
+    }
 
     @property({type: Array, attribute: false})
     public get value(): ModelEntryType[] {
@@ -515,6 +533,10 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
     }
 
     toggleNode(event: CustomEvent<{ key: string }>): void {
+        if (this._expandAll) {
+            this.expandAll = false;
+        }
+
         if (!this.expandedItems.includes(event.detail.key)) {
             this.expandedItems.push(event.detail.key);
         } else {
@@ -537,7 +559,7 @@ export class UmbNavGroup extends UmbElementMixin(LitElement) {
                                             @click=${() => this.newNode(item.key)}></uui-button-inline-create>
                                     <umbnav-item name=${item.name} key=${item.key} class=""
                                                  description="${item.description}"
-                                                 .expanded=${ this.expandAll || item.key != null && this.expandedItems.includes(item.key)}
+                                                 .expanded=${ this._expandAll || item.key != null && this.expandedItems.includes(item.key)}
                                                  .hasImage="${item.image && item.image.length > 0}"
                                                  .enableMediaPicker=${this.enableMediaPicker}
                                                  .enableVisibility=${this.enableVisibility}
