@@ -141,7 +141,7 @@ export class UmbNavModalElement extends
 						orientation="vertical"
 						label='SEO'
 						style="padding:0;"
-                    class="seo-toggles">
+                        class="seo-toggles">
                         ${when(
                                 !this.hideNoReferrerToggle,
                                 () => html`
