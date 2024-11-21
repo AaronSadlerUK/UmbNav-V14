@@ -8,16 +8,12 @@ import './umbnav-item.ts';
 import UmbNavItem from './umbnav-item.ts';
 import {UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext,} from '@umbraco-cms/backoffice/modal';
 import {v4 as uuidv4} from 'uuid';
-import {
-    UmbPropertyValueChangeEvent,
-    UmbPropertyEditorConfigProperty
-} from "@umbraco-cms/backoffice/property-editor";
+import {UmbPropertyValueChangeEvent, UmbPropertyEditorConfigProperty} from "@umbraco-cms/backoffice/property-editor";
 import {DocumentService, MediaService} from '@umbraco-cms/backoffice/external/backend-api';
 import {UMBNAV_TEXT_ITEM_MODAL} from "./modals/text-item-modal-token.ts";
 import { UMBNAV_VISIBILITY_ITEM_MODAL } from "./modals/visibility-item-modal-token.ts";
 import { UMBNAV_SETTINGS_ITEM_MODAL } from "./modals/settings-item-modal-token.ts";
 import {ImageItem, ModelEntryType} from "./umbnav.token.ts";
-import {i} from "vite/dist/node/types.d-aGj9QkWt";
 
 @customElement('umbnav-group')
 export class UmbNavGroup extends UmbElementMixin(LitElement) {
